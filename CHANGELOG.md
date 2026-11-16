@@ -6,6 +6,18 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.1.0] - 2026-11-16
+
+- **Houses spread over the whole valley:** every number of houses has its own layout around the path and the stream, so a small village no longer huddles at the top and leaves the bottom empty. Fewer houses stand a little bigger, and decorations step aside to the nearest free spot when a house takes theirs.
+- **Achievements:** 79 of them in five sections – the village, things done, steadiness, residents and special occasions (an early bird, a night owl, a full week, a comeback and more). A trophy button in the header shows how many are waiting; each one brings fireflies, and once reached it stays.
+- **Neighbours talk:** residents now chat about the house next door – an egg about to hatch, a master to learn from, a busy day.
+
+<!-- tg
+Lingvale 1.1.0: дома теперь расставляются по всей долине, даже если их немного.
+Появились достижения – 79 штук, за каждое светлячки в банку.
+Жители стали болтать о соседях.
+-->
+
 ## [1.0.1] - 2026-11-16
 
 - **Fixed:** a house card or the shop could start sliding up and down by itself, without end, after a swipe up. Sheets now stay put and stop just under the status bar ([#1](https://github.com/bigdevwhale/lingvale/issues/1)).

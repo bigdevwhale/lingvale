@@ -52,6 +52,7 @@ import app.lingvale.data.ArtStore
 import app.lingvale.data.House
 import app.lingvale.data.Status
 import app.lingvale.domain.Chat
+import app.lingvale.domain.Game
 import app.lingvale.domain.hourNow
 import app.lingvale.domain.today
 import app.lingvale.ui.theme.T
@@ -74,18 +75,67 @@ object Art {
 /** The map is the valley picture: 2 wide by 3 tall. */
 const val MAP_RATIO = 2f / 3f
 
-/** The eight clearings along the path, top to bottom, as fractions of the map: centre x, the line the house stands on. */
-val SPOTS = listOf(.20f to .22f, .79f to .25f, .20f to .435f, .80f to .445f, .20f to .68f, .79f to .68f, .21f to .905f, .79f to .89f, .50f to .995f)
+/**
+ * The clearings for a village of n houses (the build plot counts as one), as fractions of the map: centre x, the line
+ * the house stands on. Each count has its own layout spread over the whole valley, around the path and the stream,
+ * so a small village doesn't huddle at the top.
+ */
+private val LAYOUTS = listOf(
+    listOf(.72f to .40f),
+    listOf(.78f to .27f, .26f to .80f),
+    listOf(.27f to .25f, .78f to .60f, .20f to .90f),
+    listOf(.28f to .24f, .74f to .40f, .21f to .67f, .74f to .92f),
+    listOf(.28f to .23f, .74f to .37f, .21f to .66f, .78f to .79f, .21f to .94f),
+    listOf(.29f to .22f, .75f to .30f, .18f to .45f, .74f to .64f, .30f to .79f, .72f to .93f),
+    listOf(.29f to .22f, .75f to .32f, .18f to .45f, .75f to .63f, .22f to .71f, .77f to .83f, .21f to .94f),
+    listOf(.20f to .22f, .79f to .25f, .20f to .435f, .80f to .445f, .20f to .68f, .79f to .68f, .21f to .905f, .79f to .89f),
+    listOf(.20f to .22f, .79f to .25f, .20f to .435f, .80f to .445f, .20f to .68f, .79f to .68f, .21f to .905f, .79f to .89f, .50f to .995f),
+)
+/** Fewer houses stand a little bigger. */
+private val SCALES = floatArrayOf(1.25f, 1.2f, 1.15f, 1.1f, 1.05f)
+fun spots(n: Int) = LAYOUTS[n.coerceIn(1, LAYOUTS.size) - 1]
+fun houseScale(n: Int) = SCALES.getOrElse(n.coerceAtLeast(1) - 1) { 1f }
 const val HOUSE_W = .30f
 
-/** Where each decoration stands (x, foot line), along the path and the stream. */
+/** Where each decoration likes to stand (x, foot line), along the path and the stream. */
 val DECOR_SPOTS = mapOf(
     "board" to (.61f to .11f), "flowers" to (.35f to .15f), "bench" to (.61f to .35f), "lamp" to (.62f to .53f),
     "well" to (.36f to .60f), "postbox" to (.41f to .80f), "signpost" to (.70f to .99f), "appletree" to (.07f to .56f),
     "campfire" to (.62f to .75f), "beehives" to (.93f to .58f), "haycart" to (.08f to .32f), "fountain" to (.40f to .29f),
     "gazebo" to (.92f to .15f), "tent" to (.12f to .995f), "windmill" to (.85f to .10f), "balloon" to (.15f to .08f),
 )
+/** Spare places on the grass for a decoration whose own spot a house took. */
+private val DECOR_SPARE = listOf(
+    .30f to .30f, .58f to .27f, .60f to .42f, .30f to .38f, .33f to .66f, .53f to .65f, .40f to .72f, .33f to .75f,
+    .62f to .86f, .30f to .86f, .60f to .95f, .07f to .75f, .93f to .72f, .08f to .45f, .93f to .36f, .64f to .13f,
+    .36f to .18f, .93f to .90f, .07f to .90f, .62f to .62f,
+)
 private val DECOR_W = mapOf("windmill" to .17f, "balloon" to .15f, "gazebo" to .15f, "tent" to .14f, "appletree" to .14f, "fountain" to .11f, "haycart" to .12f, "lamp" to .05f, "postbox" to .06f, "signpost" to .08f, "well" to .09f, "bench" to .09f, "board" to .09f, "flowers" to .1f, "campfire" to .08f, "beehives" to .09f)
+
+/**
+ * Where the [owned] decorations stand: each on its own spot unless a house of [spots] (scaled by [scale]) is there,
+ * else on the nearest free place. Shop order decides who gets a contested place first.
+ */
+fun decorPlaces(owned: Set<String>, spots: List<Pair<Float, Float>>, scale: Float): Map<String, Pair<Float, Float>> {
+    val taken = mutableListOf<Triple<Float, Float, Float>>()
+    val out = LinkedHashMap<String, Pair<Float, Float>>()
+    val hw = HOUSE_W * scale / 2
+    fun clear(x: Float, y: Float, w: Float): Boolean {
+        val top = y - w * .9f   // a decoration is roughly as tall as it is wide
+        if (spots.any { (hx, hy) -> abs(x - hx) < hw + w / 2 && top < hy + .07f && y > hy - .17f * scale }) return false
+        return taken.none { (tx, ty, tw) -> abs(x - tx) < (w + tw) / 2 && abs(y - ty) < .06f }
+    }
+    val pool = DECOR_SPOTS.values + DECOR_SPARE
+    for (d in Game.decor) {
+        if (d.id !in owned) continue
+        val pref = DECOR_SPOTS[d.id] ?: continue
+        val w = DECOR_W[d.id] ?: .1f
+        val at = if (clear(pref.first, pref.second, w)) pref
+            else pool.filter { clear(it.first, it.second, w) }.minByOrNull { (it.first - pref.first).let { a -> a * a } + (it.second - pref.second).let { b -> b * b } } ?: continue
+        taken += Triple(at.first, at.second, w); out[d.id] = at
+    }
+    return out
+}
 
 /** Houses take the clearings from the top: the ones that live here first, then the ones moving in, then empty plots. */
 fun layout(houses: List<House>): List<House> = houses.sortedBy { when (it.status) { Status.LIVE -> 0; Status.OLD, Status.LOCKED -> 1; Status.MISSING -> 2 } }
@@ -116,9 +166,10 @@ private fun DrawScope.img(b: ImageBitmap, cx: Float, foot: Float, w: Float, filt
     else drawImage(b, IntOffset.Zero, IntSize(b.width, b.height), dst, sz, colorFilter = filter, filterQuality = FilterQuality.Low)
 }
 
+
 /**
- * The village map. [owned] decorations stand where they belong; [fair] hangs flags; [chats] float over the houses
- * one at a time. Tapping a house calls [onHouse].
+ * The village map. [owned] decorations stand where they belong (out of the houses' way); [fair] hangs flags; [chats]
+ * float over the houses one at a time. Tapping a house calls [onHouse].
  */
 @Composable
 fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boolean, chats: List<Chat>, onHouse: (House) -> Unit, modifier: Modifier = Modifier, onBuild: (() -> Unit)? = null) {
@@ -127,21 +178,25 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
     val night = hour >= 21 || hour < 5
     val sleep = hour >= 23 || hour < 6
     val dimFilter = tint(hour)?.let { ColorFilter.lighting(it, Color.Black) }
-    val placed = houses
-    val free = if (onBuild != null && houses.size < SPOTS.size) houses.size else -1
+    val placed = houses.take(LAYOUTS.size)
+    val free = if (onBuild != null && placed.size < LAYOUTS.size) placed.size else -1
+    val count = placed.size + if (free >= 0) 1 else 0
+    val spots = spots(count)
+    val sc = houseScale(count)
+    val houseW = HOUSE_W * sc
+    val decor = remember(owned, spots, sc) { decorPlaces(owned, spots, sc) }
     val time by rememberTime()
     val campfire = "campfire" in owned
     val measurer = androidx.compose.ui.text.rememberTextMeasurer()
     val plaqueStyle = T.tiny.copy(color = Color(0xFF3A2E22))
     BoxWithConstraints(modifier.fillMaxWidth().aspectRatio(MAP_RATIO)) {
-        Canvas(Modifier.fillMaxSize().pointerInput(placed) {
+        Canvas(Modifier.fillMaxSize().pointerInput(placed, spots) {
             detectTapGestures { o ->
                 val fx = o.x / size.width; val fy = o.y / size.height
-                if (free >= 0) { val (x, y) = SPOTS[free]; if (abs(fx - x) < HOUSE_W / 2 && fy in (y - .12f)..(y + .03f)) { onBuild?.invoke(); return@detectTapGestures } }
+                if (free >= 0) { val (x, y) = spots[free]; if (abs(fx - x) < houseW / 2 && fy in (y - .12f * sc)..(y + .03f)) { onBuild?.invoke(); return@detectTapGestures } }
                 placed.forEachIndexed { i, h ->
-                    if (i >= SPOTS.size) return@forEachIndexed
-                    val (x, y) = SPOTS[i]
-                    if (abs(fx - x) < HOUSE_W / 2 && fy in (y - .16f)..(y + .03f)) { onHouse(h); return@detectTapGestures }
+                    val (x, y) = spots[i]
+                    if (abs(fx - x) < houseW / 2 && fy in (y - .16f * sc)..(y + .03f)) { onHouse(h); return@detectTapGestures }
                 }
             }
         }) {
@@ -154,8 +209,7 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
             val things = mutableListOf<Thing>()
             val roofs = HashMap<Int, Float>()
             placed.forEachIndexed { i, h ->
-                if (i >= SPOTS.size) return@forEachIndexed
-                val (x, y) = SPOTS[i]
+                val (x, y) = spots[i]
                 val lit = h.lit()
                 val name = when {
                     h.live -> "house_${h.home.look.name.lowercase()}_${if (night && lit) 1 else 0}"
@@ -163,15 +217,15 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
                     else -> "plot_1"
                 }
                 val b = Art.get(ctx, name) ?: return@forEachIndexed
-                val w = (if (!h.live) HOUSE_W * .8f else if (h.home.look == app.lingvale.data.Look.TOWER) HOUSE_W * .46f else HOUSE_W) * w0
+                val w = (if (!h.live) houseW * .8f else if (h.home.look == app.lingvale.data.Look.TOWER) houseW * .46f else houseW) * w0
                 roofs[i] = y * h0 - w * b.height / b.width
                 things += Thing(y) {
                     img(b, x * w0, y * h0, w, if (night && lit) null else dimFilter)
                     if (night && lit) drawCircle(Brush.radialGradient(listOf(Color(0x44FFC870), Color.Transparent), Offset(x * w0, (y - .05f) * h0), w * .6f), w * .6f, Offset(x * w0, (y - .05f) * h0))
                 }
             }
-            for (id in owned) {
-                val (x, y) = DECOR_SPOTS[id] ?: continue
+            for ((id, at) in decor) {
+                val (x, y) = at
                 val b = Art.get(ctx, "decor_$id") ?: continue
                 val w = (DECOR_W[id] ?: .1f) * w0
                 things += Thing(y) {
@@ -184,8 +238,8 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
             }
             // The residents: each team walks on the grass in front of its house; after dark by the campfire, if there is one.
             placed.forEachIndexed { i, h ->
-                if (i >= SPOTS.size || !h.live || h.pkg == null) return@forEachIndexed
-                val (x, y) = SPOTS[i]
+                if (!h.live || h.pkg == null) return@forEachIndexed
+                val (x, y) = spots[i]
                 h.snap!!.walkers.take(3).forEachIndexed { k, p ->
                     val seed = (p.id * 31 + i * 7 + k).toInt()
                     val ph = (seed % 11) / 11f * 6.28f
@@ -209,28 +263,28 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
                 }
             }
             if (free >= 0) Art.get(ctx, "plot_0")?.let { b ->
-                val (x, y) = SPOTS[free]
-                val w = HOUSE_W * .75f * w0
+                val (x, y) = spots[free]
+                val w = houseW * .75f * w0
                 things += Thing(y) { img(b, x * w0, y * h0, w, dimFilter) }
                 roofs[-1] = y * h0 - w * b.height / b.width
             }
             things.sortedBy { it.foot }.forEach { it.draw(this) }
             if (free >= 0) roofs[-1]?.let { roof ->
-                val (x, _) = SPOTS[free]
+                val (x, _) = spots[free]
                 val label = measurer.measure(if (app.lingvale.domain.Lang.ru) "+ Построить" else "+ Build", plaqueStyle.copy(color = Color(0xFFFFF1D6)), maxLines = 1)
                 val pw = label.size.width + 14.dp.toPx(); val phh = label.size.height + 4.dp.toPx()
-                val top = roof + phh * .2f; val left = x * w0 - pw / 2
+                val top = roof + phh * .2f; val left = (x * w0 - pw / 2).coerceIn(2f, w0 - pw - 2f)
                 drawRoundRect(Color(0xFF6B4423), Offset(left, top), Size(pw, phh), androidx.compose.ui.geometry.CornerRadius(9.dp.toPx()))
                 drawText(label, topLeft = Offset(left + 7.dp.toPx(), top + 2.dp.toPx()))
             }
             // Name plaques on the roofs, above everything: residents walk below the houses, so nobody hides behind a name.
             placed.forEachIndexed { i, h ->
-                if (i >= SPOTS.size || h.status == Status.MISSING) return@forEachIndexed
-                val (x, _) = SPOTS[i]
+                if (h.status == Status.MISSING) return@forEachIndexed
+                val (x, y) = spots[i]
                 val roof = roofs[i] ?: return@forEachIndexed
                 val label = measurer.measure(h.home.house, plaqueStyle, maxLines = 1)
                 val pw = label.size.width + 12.dp.toPx(); val phh = label.size.height + 2.dp.toPx()
-                val top = maxOf(roof, (SPOTS[i].second - .15f) * h0) + phh * .35f
+                val top = maxOf(roof, (y - .15f * sc) * h0) + phh * .35f
                 val left = (x * w0 - pw / 2).coerceIn(2f, w0 - pw - 2f)
                 drawRoundRect(Color(0xE6FFF6E2), Offset(left, top), Size(pw, phh), androidx.compose.ui.geometry.CornerRadius(8.dp.toPx()))
                 drawText(label, topLeft = Offset(left + 6.dp.toPx(), top + 1.dp.toPx()))
@@ -258,10 +312,10 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
             LaunchedEffect(chats) { if (!BuildConfig.SHOTS) while (true) { delay(5200); n++ } }
             val c = chats[n % chats.size]
             val i = placed.indexOfFirst { it.home.id == c.house }
-            if (i in SPOTS.indices) {
-                val (x, y) = SPOTS[i]
+            if (i >= 0) {
+                val (x, y) = spots[i]
                 AnimatedContent(c, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "chat",
-                    modifier = Modifier.offset(x = maxWidth * (x - .26f).coerceIn(.02f, .46f), y = (maxHeight * (y - .22f)).coerceAtLeast(6.dp))) { cc ->
+                    modifier = Modifier.offset(x = maxWidth * (x - .26f).coerceIn(.02f, .46f), y = (maxHeight * (y - .22f * sc)).coerceAtLeast(6.dp))) { cc ->
                     Text(cc.text, style = T.smallB.copy(color = Color(0xFF2B2A25)), textAlign = TextAlign.Center,
                         modifier = Modifier.widthIn(max = maxWidth * .52f).clip(RoundedCornerShape(12.dp)).background(Color(0xF2FFFBEF)).padding(horizontal = 10.dp, vertical = 6.dp))
                 }

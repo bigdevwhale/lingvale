@@ -3,6 +3,9 @@ package app.lingvale
 import android.graphics.Bitmap
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
@@ -108,6 +111,10 @@ class RenderScreens {
             "09-links" to { Start.tab = 2; Start.daysTab = 2; Root() },
             "10-gazette" to { Start.tab = 2; Start.daysTab = 3; Root() },
             "11-quilt" to { Start.tab = 2; Start.daysTab = 4; Root() },
+            "12-achievements" to { androidx.compose.foundation.layout.Column(androidx.compose.ui.Modifier.padding(horizontal = 18.dp).verticalScroll(androidx.compose.foundation.rememberScrollState())) {
+                val live = c.village.houses.value.filter { it.live && it.home.id in c.prefs.built.value }
+                app.lingvale.ui.village.AchievementList(app.lingvale.domain.Achievements.all(live, 900, c.prefs.progress.value.owned.size, 4))
+            } },
         )
         var idx by mutableIntStateOf(0)
         rule.mainClock.autoAdvance = false

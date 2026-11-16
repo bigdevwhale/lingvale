@@ -96,6 +96,11 @@ fun VillageScreen(houses: List<House>, onHouse: (House) -> Unit, onSettings: () 
     val chats = remember(houses) { Game.chat(live) }
     val fair = Game.fair(live)
     var sheet by remember { mutableStateOf<String?>(null) }
+    val achs = remember(houses, total, pr.owned.size, pr.claimed.size) { app.lingvale.domain.Achievements.all(live, total, pr.owned.size, pr.claimed.count { !it.startsWith("ach:") }) }
+    // Reached once, kept for good: some achievements stand on last week's events only.
+    val reached = achs.filter { it.done && it.id !in pr.got }.map { it.id }
+    androidx.compose.runtime.LaunchedEffect(reached) { if (reached.isNotEmpty()) c.prefs.update { it.copy(got = it.got + reached) } }
+    val toClaim = achs.count { (it.done || it.id in pr.got) && "ach:${it.id}" !in pr.claimed }
     // One screen: the map takes what's left between the header and the three buttons; details open in sheets.
     Column(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color(0xFF6FA8C8), Color(0xFF8FC0D8), Color(0xFF8DBE6C))))) {
         Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -112,6 +117,11 @@ fun VillageScreen(houses: List<House>, onHouse: (House) -> Unit, onSettings: () 
                 verticalAlignment = Alignment.CenterVertically) {
                 ArtIcon("icon_firefly", 26.dp)
                 Text(fmt(balance), style = T.numS.copy(color = Color(0xFFFFE08A)))
+            }
+            Spacer(Modifier.width(6.dp))
+            Box(Modifier.size(36.dp)) {
+                Box(Modifier.size(36.dp).clip(CircleShape).background(Color(0xCC1E2418)).clickable { sheet = "achievements" }, contentAlignment = Alignment.Center) { ArtIcon("g_trophy", 24.dp) }
+                if (toClaim > 0) Text("$toClaim", style = T.tiny.copy(color = Color.White), modifier = Modifier.align(Alignment.TopEnd).clip(CircleShape).background(Color(0xFFC0392B)).padding(horizontal = 5.dp))
             }
             Spacer(Modifier.width(6.dp))
             Box(Modifier.size(36.dp).clip(CircleShape).background(Color(0xCC1E2418)).clickable(onClick = onSettings), contentAlignment = Alignment.Center) {
@@ -147,6 +157,7 @@ fun VillageScreen(houses: List<House>, onHouse: (House) -> Unit, onSettings: () 
                 "The shop has a notice board and a post box: with them, village news and a letter about last week appear here."), style = Ink.small, modifier = Modifier.padding(top = 12.dp))
         }
         "quests" -> PaperSheet({ sheet = null }) { Quests(live) }
+        "achievements" -> PaperSheet({ sheet = null }) { AchievementList(achs) }
     }
 }
 
@@ -228,6 +239,53 @@ private fun Quests(live: List<House>) {
                             Text(tr("забрать", "claim"), style = Ink.hand.copy(color = Ink.red))
                         }
                         else -> {}
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** Every achievement by section: reached ones in colour with their reward to claim, the rest greyed with how far along they are. */
+@Composable
+internal fun AchievementList(achs: List<app.lingvale.domain.Ach>) {
+    val c = LocalContext.current.container
+    val pr by c.prefs.progress.collectAsState()
+    fun got(a: app.lingvale.domain.Ach) = a.done || a.id in pr.got
+    Text(tr("Достижения", "Achievements"), style = Ink.head)
+    Text(tr("Получено ${achs.count(::got)} из ${achs.size}. За каждое – светлячки в банку.", "${achs.count(::got)} of ${achs.size} reached. Each one brings fireflies."), style = Ink.small)
+    app.lingvale.domain.Achievements.groups.forEachIndexed { g, title ->
+        val list = achs.filter { it.group == g }.sortedBy { if (got(it)) 0 else 1 }
+        if (list.isEmpty()) return@forEachIndexed
+        PaperSection("$title · ${list.count(::got)}/${list.size}") {
+            Column {
+                list.forEach { a ->
+                    val key = "ach:${a.id}"
+                    val claimed = key in pr.claimed
+                    val ok = got(a)
+                    Row(Modifier.fillMaxWidth().padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+                        ArtIcon(a.icon, 38.dp, Modifier.alpha(if (ok) 1f else .3f))
+                        Spacer(Modifier.width(10.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(a.title, style = Ink.h3.copy(color = if (ok) Ink.ink else Ink.soft))
+                            Text(a.about, style = Ink.small)
+                            if (!ok && a.goal > 1) {
+                                Meter(a.have.toFloat() / a.goal, Ink.blue, Modifier.padding(top = 3.dp).fillMaxWidth(.8f))
+                                Text("${fmt(minOf(a.have, a.goal))} / ${fmt(a.goal)}", style = Ink.small.copy(color = Ink.soft))
+                            }
+                        }
+                        when {
+                            claimed -> ArtIcon("postmark", 40.dp, Modifier.alpha(.7f))
+                            ok -> Column(Modifier.clickable { c.prefs.update { if (key in it.claimed) it else it.copy(bonus = it.bonus + a.reward, claimed = it.claimed + key) } },
+                                horizontalAlignment = Alignment.CenterHorizontally) {
+                                ArtIcon("seal", 36.dp)
+                                Text("+${a.reward}", style = Ink.hand.copy(color = Ink.red))
+                            }
+                            else -> Row(verticalAlignment = Alignment.CenterVertically) {
+                                ArtIcon("icon_firefly", 20.dp, Modifier.alpha(.5f))
+                                Text("${a.reward}", style = Ink.small.copy(color = Ink.soft))
+                            }
+                        }
                     }
                 }
             }

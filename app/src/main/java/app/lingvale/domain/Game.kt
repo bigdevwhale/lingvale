@@ -120,6 +120,26 @@ object Game {
             val na = a.snap!!.team.firstOrNull()?.name.orEmpty(); val nb = b.snap!!.team.firstOrNull()?.name.orEmpty()
             if (na.isNotBlank() && nb.isNotBlank()) out += Chat(b.home.id, tr("$nb: $na, мы сегодня тоже в деле – вечером праздник!", "$nb: $na, we're busy today too – party tonight!"))
         }
+        // Neighbours talk: each house to the next one, about what is going on next door.
+        fun nameOf(h: House) = h.snap!!.walkers.firstOrNull()?.let { p -> p.name.ifBlank { h.snap.species(p.species)?.name.orEmpty() } }.orEmpty()
+        if (live.size >= 2) for (k in live.indices) {
+            val a = live[k]; val b = live[(k + 1) % live.size]
+            if (a == b) continue
+            val na = nameOf(a); val nb = nameOf(b)
+            if (na.isBlank() || nb.isBlank()) continue
+            val sa = a.snap!!; val sb = b.snap!!
+            val aToday = sa.days.any { it.d == t }; val bToday = sb.days.any { it.d == t }
+            val bLast = sb.days.maxOfOrNull { it.d }
+            val line = when {
+                sb.pets.any { it.egg } -> tr("$na: $nb, как там ваше яйцо? Позовите, когда вылупится!", "$na: $nb, how's your egg? Call me when it hatches!")
+                sb.pets.any { it.stage >= 4 } && sa.pets.none { it.stage >= 4 } -> tr("$na: у соседей из дома «${b.home.house}» есть мастер – пойду поучусь", "$na: the ${b.home.house} has a master – off to learn a thing or two")
+                aToday && !bToday && bLast != null && t - bLast >= 3 -> tr("$na: $nb, заходи вечером – расскажу, как прошёл день", "$na: $nb, drop by tonight – I'll tell you how the day went")
+                aToday && bToday -> tr("$na и $nb: оба дома сегодня в деле!", "$na and $nb: both houses busy today!")
+                !aToday && bToday -> tr("$na: у соседей в доме «${b.home.house}» сегодня кипит жизнь", "$na: the ${b.home.house} next door is buzzing today")
+                else -> tr("$na: пойду проведаю соседей из дома «${b.home.house}»", "$na: I'll go and see the neighbours in the ${b.home.house}")
+            }
+            out += Chat(a.home.id, line)
+        }
         return out
     }
 

@@ -37,20 +37,23 @@ class Prefs(ctx: Context) {
         start = sp.getLong("start", -1L).takeIf { it >= 0 } ?: (today() - 6).also { sp.edit().putLong("start", it).apply() },
         spent = sp.getInt("spent", 0), bonus = sp.getInt("bonus", 0),
         owned = sp.getStringSet("owned", emptySet())!!.toSet(), claimed = sp.getStringSet("claimed", emptySet())!!.toSet(),
-        letter = sp.getLong("letter", 0L),
+        letter = sp.getLong("letter", 0L), got = sp.getStringSet("got", emptySet())!!.toSet(),
     )
     private val _progress = MutableStateFlow(read())
     /** The village game: what was spent, bought and claimed. Fireflies gathered are worked out from the apps' days. */
     val progress: StateFlow<Progress> = _progress
     fun update(f: (Progress) -> Progress) {
         val p = f(_progress.value)
-        sp.edit().putInt("spent", p.spent).putInt("bonus", p.bonus).putStringSet("owned", p.owned).putStringSet("claimed", p.claimed).putLong("letter", p.letter).apply()
+        sp.edit().putInt("spent", p.spent).putInt("bonus", p.bonus).putStringSet("owned", p.owned).putStringSet("claimed", p.claimed).putLong("letter", p.letter).putStringSet("got", p.got).apply()
         _progress.value = p
     }
 }
 
-/** [start]: the first day the village counts (a week before it was founded, as a welcome). [bonus]: fireflies from quests. */
-data class Progress(val start: Long, val spent: Int, val bonus: Int, val owned: Set<String>, val claimed: Set<String>, val letter: Long)
+/**
+ * [start]: the first day the village counts (a week before it was founded, as a welcome). [bonus]: fireflies from quests and achievements.
+ * [claimed]: "week:quest" for quests, "ach:id" for achievements. [got]: achievements ever reached, so they stay once the days behind them are gone.
+ */
+data class Progress(val start: Long, val spent: Int, val bonus: Int, val owned: Set<String>, val claimed: Set<String>, val letter: Long, val got: Set<String> = emptySet())
 
 class AppContainer(context: Context) {
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
