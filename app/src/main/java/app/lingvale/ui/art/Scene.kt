@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -210,7 +211,7 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
     val measurer = androidx.compose.ui.text.rememberTextMeasurer()
     val plaqueStyle = T.tiny.copy(color = Color(0xFF3A2E22))
     BoxWithConstraints(modifier.fillMaxWidth().aspectRatio(MAP_RATIO)) {
-        Canvas(Modifier.fillMaxSize().pointerInput(placed, spots) {
+        Canvas(Modifier.fillMaxSize().clipToBounds().pointerInput(placed, spots) {
             detectTapGestures { o ->
                 val fx = o.x / size.width; val fy = o.y / size.height
                 if (free >= 0) { val (x, y) = spots[free]; if (abs(fx - x) < houseW / 2 && fy in (y - .12f * sc)..(y + .03f)) { onBuild?.invoke(); return@detectTapGestures } }
@@ -241,7 +242,9 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
                 }
                 val b = Art.get(ctx, name) ?: Art.get(ctx, houseArt(h.home.look, 0, 0)) ?: return@forEachIndexed
                 // tall, narrow buildings (a tower, a spire) stand as high as the others, not wider
-                val w = (if (!h.live) houseW * .8f else houseW * minOf(1f, 1.05f * b.width / b.height)) * w0
+                val w = ((if (!h.live) houseW * .8f else houseW * minOf(1f, 1.05f * b.width / b.height)) * w0)
+                    // a tall house near the top edge (a weathervane, a spire) shrinks to stay inside the map
+                    .coerceAtMost((y - .015f) * h0 * b.width / b.height)
                 roofs[i] = y * h0 - w * b.height / b.width
                 things += Thing(y) {
                     img(b, x * w0, y * h0, w, if (night && lit) null else dimFilter)

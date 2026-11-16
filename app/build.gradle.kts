@@ -22,7 +22,7 @@ android {
         minSdk = 28
         targetSdk = 36
         versionCode = (System.getenv("VERSION_CODE") ?: "1").toInt()
-        versionName = System.getenv("VERSION_NAME") ?: "1.2.0"
+        versionName = System.getenv("VERSION_NAME") ?: "1.2.1"
         buildConfigField("boolean", "DEMO", demo.toString())
         // `-Pdemolang=en|ru` with -Pdemo: the language the demo is written and shown in, whatever the phone speaks.
         buildConfigField("String", "DEMO_LANG", "\"${(project.findProperty("demolang") as String?).orEmpty()}\"")

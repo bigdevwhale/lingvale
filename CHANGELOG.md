@@ -6,6 +6,14 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.2.1] - 2026-11-16
+
+- **Fixed:** a tall house near the top of the valley (the reading room's weathervane with the moon) no longer reaches over the header text. Such a house now stands a little smaller, and nothing is drawn outside the map.
+
+<!-- tg
+Lingvale 1.2.1: флюгер с луной на крыше Читальни больше не перекрывает надпись в шапке.
+-->
+
 ## [1.2.0] - 2026-11-16
 
 - **Make the valley yours:** the shop has three shelves now – decorations, the valley and the houses. Buy something once, then switch between what you own for free.
