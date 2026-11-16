@@ -6,6 +6,15 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.0.1] - 2026-11-16
+
+- **Fixed:** a house card or the shop could start sliding up and down by itself, without end, after a swipe up. Sheets now stay put and stop just under the status bar ([#1](https://github.com/bigdevwhale/lingvale/issues/1)).
+
+<!-- tg
+Lingvale 1.0.1: карточка дома больше не дёргается после свайпа вверх.
+Все всплывающие окна теперь стоят на месте и не заходят под строку состояния.
+-->
+
 ## [1.0.0] - 2026-11-16
 
 The first release of Lingvale, the village of the pets from all our apps.
