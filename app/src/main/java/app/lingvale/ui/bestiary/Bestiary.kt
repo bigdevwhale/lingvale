@@ -1,5 +1,6 @@
 package app.lingvale.ui.bestiary
 
+import app.lingvale.ui.components.sheetMax
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -129,7 +130,8 @@ private fun PickSheet(p: Pick, onClose: () -> Unit) {
     val snap = p.house.snap!!
     val mine = snap.pets.filter { it.species == p.sp.id && !it.egg }.sortedByDescending { it.stage }
     val best = mine.firstOrNull()
-    ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Ink.paper) {
+    ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Ink.paper, contentWindowInsets = { androidx.compose.foundation.layout.WindowInsets(0) }) {
+        androidx.compose.foundation.layout.Box(Modifier.sheetMax()) {
         Column(Modifier.fillMaxWidth().paper().padding(horizontal = 22.dp).navigationBarsPadding().padding(bottom = 22.dp)) {
             Stamp(p.house, p.sp, p.no, best, Modifier.width(200.dp).align(Alignment.CenterHorizontally), big = true)
             Gap(8.dp)
@@ -146,6 +148,7 @@ private fun PickSheet(p: Pick, onClose: () -> Unit) {
                     Text(stageName(pet.stage).lowercase() + if (pet.stage < 4) tr(" · ${(pet.progress * 100).toInt()}% до роста", " · ${(pet.progress * 100).toInt()}% to grow") else "", style = Ink.small)
                 }
             }
+        }
         }
     }
 }

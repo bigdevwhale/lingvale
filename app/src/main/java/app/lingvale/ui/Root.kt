@@ -1,5 +1,6 @@
 package app.lingvale.ui
 
+import app.lingvale.ui.components.sheetMax
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -120,7 +121,8 @@ private fun androidx.compose.foundation.layout.RowScope.Tab(icon: String, label:
 private fun SettingsSheet(onClose: () -> Unit) {
     val c = LocalContext.current.container
     val theme by c.prefs.theme.collectAsState()
-    ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = app.lingvale.ui.theme.Ink.paper) {
+    ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = app.lingvale.ui.theme.Ink.paper, contentWindowInsets = { androidx.compose.foundation.layout.WindowInsets(0) }) {
+        androidx.compose.foundation.layout.Box(Modifier.sheetMax()) {
         Column(Modifier.fillMaxWidth().paper().padding(horizontal = 20.dp).navigationBarsPadding().padding(bottom = 20.dp)) {
             Text(tr("Настройки", "Settings"), style = app.lingvale.ui.theme.Ink.head)
             app.lingvale.ui.components.PaperSection(tr("Тема", "Theme")) {}
@@ -140,13 +142,15 @@ private fun SettingsSheet(onClose: () -> Unit) {
             Text(tr("Lingvale только читает: питомцев и дни берёт у самих приложений, ничего в них не меняет и никуда не отправляет. Всё остаётся на телефоне.",
                 "Lingvale only reads: it takes the pets and days from the apps themselves, changes nothing in them and sends nothing anywhere. Everything stays on the phone."), style = app.lingvale.ui.theme.Ink.body)
         }
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Welcome(onDone: () -> Unit) {
-    ModalBottomSheet(onDismissRequest = onDone, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = app.lingvale.ui.theme.Ink.paper) {
+    ModalBottomSheet(onDismissRequest = onDone, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = app.lingvale.ui.theme.Ink.paper, contentWindowInsets = { androidx.compose.foundation.layout.WindowInsets(0) }) {
+        androidx.compose.foundation.layout.Box(Modifier.sheetMax()) {
         Column(Modifier.fillMaxWidth().paper().padding(horizontal = 20.dp).navigationBarsPadding().padding(bottom = 20.dp)) {
             Text(tr("Добро пожаловать в Lingvale", "Welcome to Lingvale"), style = app.lingvale.ui.theme.Ink.head)
             Gap(10.dp)
@@ -167,6 +171,7 @@ private fun Welcome(onDone: () -> Unit) {
             }
             Gap(16.dp)
             Btn(tr("Понятно", "Got it"), onDone)
+        }
         }
     }
 }

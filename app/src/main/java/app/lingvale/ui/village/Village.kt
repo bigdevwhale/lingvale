@@ -1,5 +1,6 @@
 package app.lingvale.ui.village
 
+import app.lingvale.ui.components.sheetMax
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -167,8 +168,10 @@ private fun RowScope.Action(icon: String, value: String, label: String, alert: B
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun PaperSheet(onClose: () -> Unit, content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit) {
-    androidx.compose.material3.ModalBottomSheet(onDismissRequest = onClose, sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Ink.paper) {
+    androidx.compose.material3.ModalBottomSheet(onDismissRequest = onClose, sheetState = androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Ink.paper, contentWindowInsets = { androidx.compose.foundation.layout.WindowInsets(0) }) {
+        androidx.compose.foundation.layout.Box(Modifier.sheetMax()) {
         Column(Modifier.fillMaxWidth().paper().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp).navigationBarsPadding().padding(bottom = 18.dp), content = content)
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 package app.lingvale.ui.village
 
+import app.lingvale.ui.components.sheetMax
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,8 +52,10 @@ fun ShopSheet(houses: List<House>, onClose: () -> Unit) {
     val total = Game.gathered(live, pr.start) + pr.bonus
     val balance = total - pr.spent
     val level = Game.level(total)
-    ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Ink.paper) {
+    ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Ink.paper, contentWindowInsets = { androidx.compose.foundation.layout.WindowInsets(0) }) {
+        androidx.compose.foundation.layout.Box(Modifier.sheetMax()) {
         ShopBody(houses)
+        }
     }
 }
 

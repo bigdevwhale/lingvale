@@ -1,5 +1,6 @@
 package app.lingvale.ui.village
 
+import app.lingvale.ui.components.sheetMax
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.core.Animatable
@@ -100,8 +101,11 @@ private fun petName(h: House, p: PetInfo) = p.name.ifBlank { h.snap!!.species(p.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HouseSheet(h: House, onClose: () -> Unit, onDemolish: (() -> Unit)? = null) {
-    ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Ink.paper, dragHandle = null) {
+    ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = Ink.paper, dragHandle = null,
+        contentWindowInsets = { androidx.compose.foundation.layout.WindowInsets(0) }) {
+        androidx.compose.foundation.layout.Box(Modifier.sheetMax(handle = 8.dp)) {
         HouseBody(h, onDemolish = onDemolish)
+        }
     }
 }
 

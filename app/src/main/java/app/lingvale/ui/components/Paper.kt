@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -61,4 +63,17 @@ fun PaperSection(title: String, modifier: Modifier = Modifier, content: @Composa
         Rule(modifier = Modifier.padding(top = 4.dp, bottom = 10.dp), color = Ink.rule)
         Box { content() }
     }
+}
+
+/**
+ * Caps a bottom sheet's content so the sheet stops under the status bar ([handle] is the drag handle above it).
+ * The sheets take no window insets of their own: Material's status-bar inset on a sheet about as tall as the
+ * screen made it bounce up and down forever after a swipe up (issue #1).
+ */
+@Composable
+fun Modifier.sheetMax(handle: Dp = 48.dp): Modifier {
+    val d = androidx.compose.ui.platform.LocalDensity.current
+    val window = androidx.compose.ui.platform.LocalWindowInfo.current.containerSize.height
+    val top = androidx.compose.foundation.layout.WindowInsets.statusBars.getTop(d)
+    return this.then(Modifier.heightIn(max = with(d) { (window - top).toDp() } - handle))
 }
