@@ -35,6 +35,8 @@ fun fmt(n: Int): String = "%,d".format(Locale.US, n).replace(",", if (Lang.ru) "
 fun today(): Long = LocalDate.now().toEpochDay()
 fun dayOf(ms: Long): Long = Instant.ofEpochMilli(ms).atZone(ZoneId.systemDefault()).toLocalDate().toEpochDay()
 fun hourNow(): Int = java.time.LocalTime.now().hour
+/** The hour with its minutes, 18.5 for half past six in the evening. */
+fun hourFrac(): Float = java.time.LocalTime.now().let { it.hour + it.minute / 60f }
 
 private fun loc() = if (Lang.ru) Locale.forLanguageTag("ru") else Locale.ENGLISH
 

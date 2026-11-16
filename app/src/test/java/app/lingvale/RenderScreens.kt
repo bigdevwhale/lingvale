@@ -111,6 +111,16 @@ class RenderScreens {
             "09-links" to { Start.tab = 2; Start.daysTab = 2; Root() },
             "10-gazette" to { Start.tab = 2; Start.daysTab = 3; Root() },
             "11-quilt" to { Start.tab = 2; Start.daysTab = 4; Root() },
+            "13-shop-valley" to { app.lingvale.ui.village.ShopBody(c.village.houses.value.filter { it.live }, startTab = 1) },
+            "14-shop-houses" to { app.lingvale.ui.village.ShopBody(c.village.houses.value.filter { it.live }, startTab = 2) },
+            "15-village-winter" to {
+                c.prefs.setStyle { it.copy(bg = "winter", path = "stone", weather = "snow", skins = mapOf("puffling" to 1, "pumpling" to 2, "pennyling" to 1)) }
+                Start.tab = 0; Root()
+            },
+            "16-village-autumn" to {
+                c.prefs.setStyle { it.copy(bg = "autumn", path = "brick", weather = "leaves", skins = mapOf("puffling" to 2, "pumpling" to 1, "pennyling" to 2)) }
+                Start.tab = 0; Root()
+            },
             "12-achievements" to { androidx.compose.foundation.layout.Column(androidx.compose.ui.Modifier.padding(horizontal = 18.dp).verticalScroll(androidx.compose.foundation.rememberScrollState())) {
                 val live = c.village.houses.value.filter { it.live && it.home.id in c.prefs.built.value }
                 app.lingvale.ui.village.AchievementList(app.lingvale.domain.Achievements.all(live, 900, c.prefs.progress.value.owned.size, 4))

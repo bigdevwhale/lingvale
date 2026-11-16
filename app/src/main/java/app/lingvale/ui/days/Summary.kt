@@ -1,5 +1,7 @@
 package app.lingvale.ui.days
 
+import app.lingvale.ui.art.art
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -60,7 +62,8 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
-private fun House.icon() = "house_${home.look.name.lowercase()}_0"
+@androidx.compose.runtime.Composable
+private fun House.icon() = art(0)
 
 /** The «Day» tab: a strip of two weeks to pick from, then the chosen day in figures, hour by hour and thing by thing. */
 @Composable

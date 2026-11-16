@@ -33,6 +33,20 @@ class Prefs(ctx: Context) {
         get() = sp.getBoolean("welcomed", false)
         set(v) = sp.edit().putBoolean("welcomed", v).apply()
 
+    private fun readStyle() = Styling(
+        bg = sp.getString("bg", "summer").orEmpty(), path = sp.getString("path", "sand").orEmpty(), weather = sp.getString("weather", "").orEmpty(),
+        skins = sp.getString("skins", "").orEmpty().split(',').mapNotNull { e -> e.split(':').takeIf { it.size == 2 }?.let { it[0] to (it[1].toIntOrNull() ?: 0) } }.toMap(),
+    )
+    private val _style = MutableStateFlow(readStyle())
+    /** How the village looks: the chosen season, path, weather and house designs. */
+    val style: StateFlow<Styling> = _style
+    fun setStyle(f: (Styling) -> Styling) {
+        val s = f(_style.value)
+        sp.edit().putString("bg", s.bg).putString("path", s.path).putString("weather", s.weather)
+            .putString("skins", s.skins.filterValues { it > 0 }.entries.joinToString(",") { "${it.key}:${it.value}" }).apply()
+        _style.value = s
+    }
+
     private fun read() = Progress(
         start = sp.getLong("start", -1L).takeIf { it >= 0 } ?: (today() - 6).also { sp.edit().putLong("start", it).apply() },
         spent = sp.getInt("spent", 0), bonus = sp.getInt("bonus", 0),
@@ -54,6 +68,9 @@ class Prefs(ctx: Context) {
  * [claimed]: "week:quest" for quests, "ach:id" for achievements. [got]: achievements ever reached, so they stay once the days behind them are gone.
  */
 data class Progress(val start: Long, val spent: Int, val bonus: Int, val owned: Set<String>, val claimed: Set<String>, val letter: Long, val got: Set<String> = emptySet())
+
+/** The look of the village: [bg] a season id (or "calendar"), [path] a path id, [weather] a weather id ("" for clear), [skins] house id to design. */
+data class Styling(val bg: String = "summer", val path: String = "sand", val weather: String = "", val skins: Map<String, Int> = emptyMap())
 
 class AppContainer(context: Context) {
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)

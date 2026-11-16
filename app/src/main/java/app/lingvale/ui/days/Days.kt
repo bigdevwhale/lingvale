@@ -1,5 +1,7 @@
 package app.lingvale.ui.days
 
+import app.lingvale.ui.art.art
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -134,7 +136,7 @@ private fun Paper(live: List<House>, day: Long, onDay: (Long) -> Unit) {
                     col.forEach { p ->
                         val lead = p.house.snap!!.team.firstOrNull()
                         Row(verticalAlignment = Alignment.Bottom) {
-                            ArtIcon("house_${p.house.home.look.name.lowercase()}_0", 54.dp)
+                            ArtIcon(p.house.art(0), 54.dp)
                             if (lead != null && p.house.pkg != null) Sprite(p.house.pkg, lead.species, lead.stage, 40.dp, shiny = lead.shiny)
                         }
                         Text(p.title, style = Ink.h3)
@@ -271,7 +273,7 @@ private fun Skyline(live: List<House>, owned: Set<String>) {
     Box(Modifier.fillMaxWidth().height(78.dp), contentAlignment = Alignment.BottomCenter) {
         Row(Modifier.fillMaxWidth().padding(bottom = 3.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.Bottom) {
             extras.getOrNull(0)?.let { ArtIcon("decor_$it", 40.dp) }
-            live.forEach { h -> ArtIcon("house_${h.home.look.name.lowercase()}_0", if (h.home.look == app.lingvale.data.Look.TOWER) 70.dp else 60.dp) }
+            live.forEach { h -> ArtIcon(h.art(0), if (h.home.look == app.lingvale.data.Look.TOWER) 70.dp else 60.dp) }
             extras.getOrNull(1)?.let { ArtIcon("decor_$it", 40.dp) }
         }
         Rule(modifier = Modifier.align(Alignment.BottomCenter))

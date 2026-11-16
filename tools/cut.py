@@ -79,8 +79,19 @@ NAV = ["nav_village", "nav_album", "nav_days"]
 FRAMES = ["frame_oval", "frame_stamp", "seal", "plaque", "calendar", "banner", "star", "postmark"]
 
 
+def skins():
+    """The house designs from the shop (tools/gen_skins.py): house_<look>_s<design>_<0|1>."""
+    for look in LOOKS:
+        f = SHEETS / f"skin_{look}.png"
+        if f.exists():
+            for n, fr in enumerate(frames(f, 2, 2)):
+                save(fr, f"house_{look}_s{n // 2 + 1}_{n % 2}")
+            print("skins", look)
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
+    skins()
     for look in LOOKS:
         f = SHEETS / f"{look}.png"
         if f.exists():

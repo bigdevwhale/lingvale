@@ -1,5 +1,7 @@
 package app.lingvale.ui.village
 
+import app.lingvale.ui.art.art
+
 import app.lingvale.ui.components.sheetMax
 import android.content.Intent
 import android.net.Uri
@@ -120,7 +122,7 @@ fun HouseBody(h: House, modifier: Modifier = Modifier, startTab: Int = 0, onDemo
                 Room(h)
                 Column(Modifier.padding(horizontal = 16.dp)) {
                     Row(Modifier.padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        ArtIcon("house_${h.home.look.name.lowercase()}_0", 52.dp)
+                        ArtIcon(h.art(0), 52.dp)
                         Spacer(Modifier.width(10.dp))
                         Column(Modifier.weight(1f)) {
                             Text(h.home.house, style = Ink.head)

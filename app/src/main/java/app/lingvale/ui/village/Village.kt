@@ -1,5 +1,7 @@
 package app.lingvale.ui.village
 
+import app.lingvale.ui.art.art
+
 import app.lingvale.ui.components.sheetMax
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -96,7 +98,8 @@ fun VillageScreen(houses: List<House>, onHouse: (House) -> Unit, onSettings: () 
     val chats = remember(houses) { Game.chat(live) }
     val fair = Game.fair(live)
     var sheet by remember { mutableStateOf<String?>(null) }
-    val achs = remember(houses, total, pr.owned.size, pr.claimed.size) { app.lingvale.domain.Achievements.all(live, total, pr.owned.size, pr.claimed.count { !it.startsWith("ach:") }) }
+    val style by c.prefs.style.collectAsState()
+    val achs = remember(houses, total, pr.owned, pr.claimed.size) { app.lingvale.domain.Achievements.all(live, total, Game.decor.count { it.id in pr.owned }, pr.claimed.count { !it.startsWith("ach:") }) }
     // Reached once, kept for good: some achievements stand on last week's events only.
     val reached = achs.filter { it.done && it.id !in pr.got }.map { it.id }
     androidx.compose.runtime.LaunchedEffect(reached) { if (reached.isNotEmpty()) c.prefs.update { it.copy(got = it.got + reached) } }
@@ -130,7 +133,7 @@ fun VillageScreen(houses: List<House>, onHouse: (House) -> Unit, onSettings: () 
         }
         BoxWithConstraints(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
             val w = minOf(maxWidth, maxHeight * MAP_RATIO)
-            Box(Modifier.width(w)) { VillageMap(houses, c.art, pr.owned, fair, chats, onHouse, onBuild = onBuild) }
+            Box(Modifier.width(w)) { VillageMap(houses, c.art, pr.owned, fair, chats, onHouse, onBuild = onBuild, style = style) }
         }
         if (live.isEmpty()) {
             Text(if (onBuild != null) tr("Долина пока пустая. Нажмите на участок «+ Построить» и выберите первый дом.", "The valley is empty. Tap the «+ Build» plot and pick the first house.")
@@ -208,7 +211,7 @@ private fun Today(live: List<House>, fair: Boolean) {
             }
             Gap(8.dp)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                live.forEach { h -> ArtIcon("house_${h.home.look.name.lowercase()}_${if (h in busy) 1 else 0}", 44.dp, Modifier.alpha(if (h in busy) 1f else .45f)) }
+                live.forEach { h -> ArtIcon(h.art(if (h in busy) 1 else 0), 44.dp, Modifier.alpha(if (h in busy) 1f else .45f)) }
             }
         }
     }
@@ -321,7 +324,7 @@ fun BuildSheet(all: List<House>, built: List<String>, onBuild: (House) -> Unit, 
         if (can.isEmpty()) Text(tr("Все доступные дома уже стоят в деревне.", "Every house you can build is already up."), style = Ink.body)
         can.forEach { h ->
             Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                ArtIcon("house_${h.home.look.name.lowercase()}_0", 64.dp)
+                ArtIcon(h.art(0), 64.dp)
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
                     Text(h.home.house, style = Ink.h3)
@@ -338,7 +341,7 @@ fun BuildSheet(all: List<House>, built: List<String>, onBuild: (House) -> Unit, 
                         Row(Modifier.fillMaxWidth().clickable {
                             runCatching { ctx.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(h.home.page)).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) }
                         }.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
-                            ArtIcon("house_${h.home.look.name.lowercase()}_0", 40.dp, Modifier.alpha(.45f))
+                            ArtIcon(h.art(0), 40.dp, Modifier.alpha(.45f))
                             Spacer(Modifier.width(10.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(h.home.house, style = Ink.body.copy(color = Ink.soft))

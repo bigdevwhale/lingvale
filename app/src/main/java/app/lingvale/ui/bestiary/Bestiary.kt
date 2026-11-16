@@ -1,5 +1,7 @@
 package app.lingvale.ui.bestiary
 
+import app.lingvale.ui.art.art
+
 import app.lingvale.ui.components.sheetMax
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -77,7 +79,7 @@ fun BestiaryScreen(houses: List<House>) {
             Box(Modifier.fillMaxWidth(if (total == 0) 0f else met.toFloat() / total).height(6.dp).background(Ink.red))
         }
         Gap(12.dp)
-        IconTabs(live.map { "house_${it.home.look.name.lowercase()}_0" to it.home.house }, page, { page = it })
+        IconTabs(live.map { it.art(0) to it.home.house }, page, { page = it })
         val h = live[page.coerceIn(live.indices)]
         val snap = h.snap!!
         val mine = snap.hatched.groupBy { it.species }

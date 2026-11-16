@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -53,7 +54,12 @@ import app.lingvale.data.House
 import app.lingvale.data.Status
 import app.lingvale.domain.Chat
 import app.lingvale.domain.Game
-import app.lingvale.domain.hourNow
+import app.lingvale.domain.hourFrac
+import app.lingvale.domain.Style
+import app.lingvale.domain.houseArt
+import app.lingvale.Styling
+import app.lingvale.container
+import androidx.compose.runtime.collectAsState
 import app.lingvale.domain.today
 import app.lingvale.ui.theme.T
 import kotlinx.coroutines.delay
@@ -140,13 +146,25 @@ fun decorPlaces(owned: Set<String>, spots: List<Pair<Float, Float>>, scale: Floa
 /** Houses take the clearings from the top: the ones that live here first, then the ones moving in, then empty plots. */
 fun layout(houses: List<House>): List<House> = houses.sortedBy { when (it.status) { Status.LIVE -> 0; Status.OLD, Status.LOCKED -> 1; Status.MISSING -> 2 } }
 
-/** What the time of day does to the picture: a colour it is multiplied by. */
-private fun tint(h: Int): Color? = when (h) {
-    in 8..17 -> null
-    in 5..7 -> Color(0xFFFFE2C8)
-    in 18..20 -> Color(0xFFFFC9A0)
-    21 -> Color(0xFF8A90C0)
-    else -> Color(0xFF5A6496)
+/** The light through the day, by the phone's clock: an hour and the colour the picture is multiplied by then. */
+private val LIGHT = listOf(
+    0f to Color(0xFF5A6496), 4.5f to Color(0xFF5A6496), 6f to Color(0xFFFFD2B0), 7.5f to Color(0xFFFFEEDD), 9f to Color.White,
+    17f to Color.White, 18.5f to Color(0xFFFFDDB8), 20f to Color(0xFFFFB98E), 21f to Color(0xFF8A90C0), 22.5f to Color(0xFF5A6496), 24f to Color(0xFF5A6496),
+)
+
+/** What the time of day [h] (with minutes as a fraction) does to the picture, shading smoothly from one hour to the next. */
+private fun tint(h: Float): Color? {
+    val k = LIGHT.indexOfLast { it.first <= h }.coerceIn(0, LIGHT.size - 2)
+    val (h0, c0) = LIGHT[k]; val (h1, c1) = LIGHT[k + 1]
+    val c = androidx.compose.ui.graphics.lerp(c0, c1, ((h - h0) / (h1 - h0)).coerceIn(0f, 1f))
+    return if (c == Color.White) null else c
+}
+
+/** The picture of this house in the design chosen in the shop: by day (0) or night (1). */
+@Composable
+fun House.art(n: Int = 0): String {
+    val st by LocalContext.current.container.prefs.style.collectAsState()
+    return houseArt(home.look, st.skins[home.id] ?: 0, n)
 }
 
 private fun House.lit() = live && snap!!.days.any { it.d > today() - 7 }
@@ -172,12 +190,14 @@ private fun DrawScope.img(b: ImageBitmap, cx: Float, foot: Float, w: Float, filt
  * float over the houses one at a time. Tapping a house calls [onHouse].
  */
 @Composable
-fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boolean, chats: List<Chat>, onHouse: (House) -> Unit, modifier: Modifier = Modifier, onBuild: (() -> Unit)? = null) {
+fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boolean, chats: List<Chat>, onHouse: (House) -> Unit, modifier: Modifier = Modifier, onBuild: (() -> Unit)? = null, style: Styling = Styling()) {
     val ctx = LocalContext.current
-    val hour = remember { hourNow() }
+    // The time of day follows the phone's clock, checked every half minute.
+    val clock by produceState(hourFrac()) { if (!BuildConfig.SHOTS) while (true) { delay(30_000); value = hourFrac() } }
+    val hour = clock.toInt()
     val night = hour >= 21 || hour < 5
     val sleep = hour >= 23 || hour < 6
-    val dimFilter = tint(hour)?.let { ColorFilter.lighting(it, Color.Black) }
+    val dimFilter = remember(clock) { tint(clock)?.let { ColorFilter.lighting(it, Color.Black) } }
     val placed = houses.take(LAYOUTS.size)
     val free = if (onBuild != null && placed.size < LAYOUTS.size) placed.size else -1
     val count = placed.size + if (free >= 0) 1 else 0
@@ -201,8 +221,11 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
             }
         }) {
             val w0 = size.width; val h0 = size.height
-            Art.get(ctx, "valley_bg")?.let { drawImage(it, IntOffset.Zero, IntSize(it.width, it.height), IntOffset.Zero, IntSize(w0.roundToInt(), h0.roundToInt()), colorFilter = dimFilter, filterQuality = FilterQuality.Low) }
+            Art.get(ctx, Style.valley(style.bg))?.let { drawImage(it, IntOffset.Zero, IntSize(it.width, it.height), IntOffset.Zero, IntSize(w0.roundToInt(), h0.roundToInt()), colorFilter = dimFilter, filterQuality = FilterQuality.Low) }
             val t = time
+            Style.paths.firstOrNull { it.id == style.path && it.art.isNotEmpty() }?.let { p ->
+                Art.get(ctx, p.art)?.let { drawImage(it, IntOffset.Zero, IntSize(it.width, it.height), IntOffset.Zero, IntSize(w0.roundToInt(), h0.roundToInt()), colorFilter = dimFilter, filterQuality = FilterQuality.Low) }
+            }
 
             // Everything that stands, drawn from the back (top) to the front (bottom).
             class Thing(val foot: Float, val draw: DrawScope.() -> Unit)
@@ -212,12 +235,13 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
                 val (x, y) = spots[i]
                 val lit = h.lit()
                 val name = when {
-                    h.live -> "house_${h.home.look.name.lowercase()}_${if (night && lit) 1 else 0}"
+                    h.live -> houseArt(h.home.look, style.skins[h.home.id] ?: 0, if (night && lit) 1 else 0)
                     h.status == Status.MISSING -> "plot_0"
                     else -> "plot_1"
                 }
-                val b = Art.get(ctx, name) ?: return@forEachIndexed
-                val w = (if (!h.live) houseW * .8f else if (h.home.look == app.lingvale.data.Look.TOWER) houseW * .46f else houseW) * w0
+                val b = Art.get(ctx, name) ?: Art.get(ctx, houseArt(h.home.look, 0, 0)) ?: return@forEachIndexed
+                // tall, narrow buildings (a tower, a spire) stand as high as the others, not wider
+                val w = (if (!h.live) houseW * .8f else houseW * minOf(1f, 1.05f * b.width / b.height)) * w0
                 roofs[i] = y * h0 - w * b.height / b.width
                 things += Thing(y) {
                     img(b, x * w0, y * h0, w, if (night && lit) null else dimFilter)
@@ -269,6 +293,7 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
                 roofs[-1] = y * h0 - w * b.height / b.width
             }
             things.sortedBy { it.foot }.forEach { it.draw(this) }
+            clipRect { weather(style.weather, t, night) }
             if (free >= 0) roofs[-1]?.let { roof ->
                 val (x, _) = spots[free]
                 val label = measurer.measure(if (app.lingvale.domain.Lang.ru) "+ Построить" else "+ Build", plaqueStyle.copy(color = Color(0xFFFFF1D6)), maxLines = 1)
@@ -320,6 +345,41 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
                         modifier = Modifier.widthIn(max = maxWidth * .52f).clip(RoundedCornerShape(12.dp)).background(Color(0xF2FFFBEF)).padding(horizontal = 10.dp, vertical = 6.dp))
                 }
             }
+        }
+    }
+}
+
+/** What falls from the sky (or flutters over the meadow), bought in the shop. */
+private fun DrawScope.weather(kind: String, t: Float, night: Boolean) {
+    val w0 = size.width; val h0 = size.height
+    fun fall(k: Int, speed: Float) = ((k * .0713f + t * speed) % 1.08f) - .04f
+    when (kind) {
+        "snow" -> for (k in 0 until 70) {
+            val x = (k * .137f + .015f * sin(t * .6f + k)) % 1f
+            drawCircle(Color(1f, 1f, 1f, .88f), w0 * (.0035f + .0018f * (k % 3)), Offset(x * w0, fall(k, .025f + .008f * (k % 3)) * h0))
+        }
+        "leaves", "petals" -> {
+            val colors = if (kind == "leaves") listOf(Color(0xFFD9822B), Color(0xFFB8452C), Color(0xFFE3B341), Color(0xFF9C5B2E))
+                else listOf(Color(0xFFF7C6D9), Color(0xFFF2A7C3), Color(0xFFFFE1EC))
+            val n = if (kind == "leaves") 22 else 34
+            for (k in 0 until n) {
+                val x = (k * .173f + .05f * sin(t * .5f + k * 1.3f) + t * .006f) % 1f
+                val y = fall(k, if (kind == "leaves") .03f else .02f)
+                val sz = w0 * (if (kind == "leaves") .016f else .011f)
+                withTransform({ rotate((t * 60f + k * 47f) % 360f, Offset(x * w0, y * h0)); scale(1f, .45f + .4f * abs(sin(t * 2f + k)), Offset(x * w0, y * h0)) }) {
+                    drawOval(colors[k % colors.size], Offset(x * w0 - sz / 2, y * h0 - sz / 4), Size(sz, sz / 2))
+                }
+            }
+        }
+        "butterflies" -> if (!night) for (k in 0 until 7) {
+            val cx = (.5f + .42f * sin(t * (.07f + k * .011f) + k * 2.1f)) * w0
+            val cy = (.15f + (k * .13f) % .8f + .03f * sin(t * .5f + k)) * h0
+            val flap = .25f + .75f * abs(sin(t * 11f + k))
+            val wing = w0 * .012f
+            val c = listOf(Color(0xFFF4D03F), Color(0xFFFFFFFF), Color(0xFF8EC9F0), Color(0xFFF5A3C7))[k % 4]
+            drawOval(c, Offset(cx - wing * flap, cy - wing / 2), Size(wing * flap, wing))
+            drawOval(c, Offset(cx, cy - wing / 2), Size(wing * flap, wing))
+            drawOval(Color(0xFF3B2A1E), Offset(cx - wing * .12f, cy - wing * .45f), Size(wing * .24f, wing * .9f))
         }
     }
 }

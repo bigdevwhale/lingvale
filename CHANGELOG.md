@@ -6,6 +6,21 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.2.0] - 2026-11-16
+
+- **Make the valley yours:** the shop has three shelves now – decorations, the valley and the houses. Buy something once, then switch between what you own for free.
+- **Seasons:** spring in blossom, golden autumn, snowy winter with a frozen stream, a lilac fairy-tale dusk, and «By the calendar», where the season follows the months. The path, the stream and the houses' clearings stay exactly where they were.
+- **Paths and weather:** a cobbled or a brick road, and snowfall, falling leaves, cherry petals or butterflies over the meadow.
+- **House designs:** two new looks for every house, 18 in all – a greenhouse or a mountain hut for the tea house, a dojo or a boathouse for the gym, a mushroom house, an observatory, a lighthouse, a typewriter house, a treehouse library, a movie palace and more. The chosen look shows everywhere: on the map, in the house card, the album and Days.
+- **The time of day follows the clock:** the light now changes smoothly through dawn, day, sunset and night while the village is open, instead of being set once when it opens.
+
+<!-- tg
+Lingvale 1.2.0: деревню теперь можно обставить по-своему.
+В лавке появились времена года, мощёные и кирпичные дорожки, снегопад, листопад и бабочки.
+У каждого дома по два новых облика – от грибного домика до обсерватории.
+Свет в долине плавно меняется по часам: рассвет, день, закат и ночь.
+-->
+
 ## [1.1.0] - 2026-11-16
 
 - **Houses spread over the whole valley:** every number of houses has its own layout around the path and the stream, so a small village no longer huddles at the top and leaves the bottom empty. Fewer houses stand a little bigger, and decorations step aside to the nearest free spot when a house takes theirs.
