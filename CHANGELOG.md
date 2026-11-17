@@ -6,6 +6,19 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.2.2] - 2026-11-17
+
+### Fixed
+- **The reading room keeps its hat to itself:** in a village of eight or nine houses it stood under the cinema and its tall witch's-hat roof rose over the cinema's residents. Its row is a little lower now, and a house whose wide roof would reach the residents above is drawn a little smaller (#2).
+
+### Added
+- **Weekly tasks say how to do them:** a line on top says what counts, and tapping a task opens a short hint.
+
+<!-- tg
+«Читальня» больше не налезает шляпой на «Кинотеатр» и его жителей.
+Задания недели теперь подсказывают, как их выполнить: нажмите на задание.
+-->
+
 ## [1.2.1] - 2026-11-16
 
 - **Fixed:** a tall house near the top of the valley (the reading room's weathervane with the moon) no longer reaches over the header text. Such a house now stands a little smaller, and nothing is drawn outside the map.
