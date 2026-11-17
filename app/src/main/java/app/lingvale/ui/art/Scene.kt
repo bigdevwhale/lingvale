@@ -95,12 +95,22 @@ private val LAYOUTS = listOf(
     listOf(.28f to .23f, .74f to .37f, .21f to .66f, .78f to .79f, .21f to .94f),
     listOf(.29f to .22f, .75f to .30f, .18f to .45f, .74f to .64f, .30f to .79f, .72f to .93f),
     listOf(.29f to .22f, .75f to .32f, .18f to .45f, .75f to .63f, .22f to .71f, .77f to .83f, .21f to .94f),
-    listOf(.20f to .22f, .79f to .25f, .20f to .435f, .80f to .445f, .20f to .68f, .79f to .68f, .21f to .905f, .79f to .89f),
-    listOf(.20f to .22f, .79f to .25f, .20f to .435f, .80f to .445f, .20f to .68f, .79f to .68f, .21f to .905f, .79f to .89f, .50f to .995f),
+    listOf(.20f to .22f, .79f to .25f, .20f to .46f, .80f to .445f, .20f to .68f, .79f to .68f, .21f to .905f, .79f to .89f),
+    listOf(.20f to .22f, .79f to .25f, .20f to .46f, .80f to .445f, .20f to .68f, .79f to .68f, .21f to .905f, .79f to .89f, .50f to .995f),
 )
 /** Fewer houses stand a little bigger. */
 private val SCALES = floatArrayOf(1.25f, 1.2f, 1.15f, 1.1f, 1.05f)
 fun spots(n: Int) = LAYOUTS[n.coerceIn(1, LAYOUTS.size) - 1]
+
+/**
+ * How tall a house at [i] of [spots] may stand, as a fraction of the map's height: up to just below the residents
+ * walking in front of the house above it in the same column (#2), or no limit when there is none.
+ */
+fun roomAbove(spots: List<Pair<Float, Float>>, i: Int): Float {
+    val (x, y) = spots[i]
+    val above = spots.filter { (ox, oy) -> abs(ox - x) < .2f && oy < y }.maxOfOrNull { it.second } ?: return 1f
+    return y - above - .06f
+}
 fun houseScale(n: Int) = SCALES.getOrElse(n.coerceAtLeast(1) - 1) { 1f }
 const val HOUSE_W = .30f
 
@@ -245,6 +255,8 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
                 val w = ((if (!h.live) houseW * .8f else houseW * minOf(1f, 1.05f * b.width / b.height)) * w0)
                     // a tall house near the top edge (a weathervane, a spire) shrinks to stay inside the map
                     .coerceAtMost((y - .015f) * h0 * b.width / b.height)
+                    // and a wide roof stays clear of the residents of the house above; a slim spire may pass them
+                    .let { if (b.width < b.height * .6f) it else it.coerceAtMost(roomAbove(spots, i) * h0 * b.width / b.height) }
                 roofs[i] = y * h0 - w * b.height / b.width
                 things += Thing(y) {
                     img(b, x * w0, y * h0, w, if (night && lit) null else dimFilter)
