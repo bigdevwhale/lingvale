@@ -217,8 +217,9 @@ private fun Today(live: List<House>, fair: Boolean) {
     }
 }
 
+/** This week's tasks; tap one for how to do it ([openAll] shows every hint, for the screen renders). */
 @Composable
-private fun Quests(live: List<House>) {
+internal fun Quests(live: List<House>, openAll: Boolean = false) {
     val c = LocalContext.current.container
     val pr by c.prefs.progress.collectAsState()
     val week = mondayOf(today())
@@ -237,7 +238,7 @@ private fun Quests(live: List<House>) {
                     Column(Modifier.weight(1f)) {
                         Text(q.title, style = Ink.h3.copy(color = if (claimed) Ink.soft else Ink.ink))
                         Text(tr("${minOf(q.have, q.goal)} из ${q.goal} · награда ${q.reward}", "${minOf(q.have, q.goal)} of ${q.goal} · reward ${q.reward}"), style = Ink.hand.copy(color = if (claimed) Ink.rule else Ink.blue))
-                        if (open == q.id) Text(q.hint, style = Ink.small, modifier = Modifier.padding(top = 4.dp))
+                        if (openAll || open == q.id) Text(q.hint, style = Ink.small, modifier = Modifier.padding(top = 4.dp))
                     }
                     when {
                         claimed -> ArtIcon("postmark", 46.dp, Modifier.alpha(.7f))
