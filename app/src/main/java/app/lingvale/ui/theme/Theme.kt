@@ -4,6 +4,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -26,9 +29,9 @@ val Light = Pal(false, c(0xF4F1E6), c(0xFFFFFF), c(0xEBE6D7), c(0x26302A), c(0x7
 val Dark = Pal(true, c(0x121712), c(0x1B221C), c(0x232C24), c(0xE8EEE6), c(0x8F9A8E), c(0x2B342B), c(0x283128),
     c(0x86C08A), c(0x0F1A10), c(0x1E3220), c(0xF0B455), c(0x3A2E1A), c(0x161C16), Color(0x55000000))
 
-/** The palette in use; switched by the theme setting before the tree is drawn. */
+/** The palette in use; switched by the theme setting, and everything that read it is drawn again. */
 object C {
-    @Volatile var p: Pal = Light
+    var p: Pal by mutableStateOf(Light)
     val dark get() = p.dark
     val bg get() = p.bg; val card get() = p.card; val card2 get() = p.card2; val ink get() = p.ink; val mute get() = p.mute
     val line get() = p.line; val track get() = p.track; val acc get() = p.acc; val accInk get() = p.accInk; val accSoft get() = p.accSoft
@@ -41,10 +44,18 @@ val Inter = FontFamily(Font(R.font.inter_regular, FontWeight.Normal), Font(R.fon
 val Serif = FontFamily(Font(R.font.pt_serif_regular, FontWeight.Normal), Font(R.font.pt_serif_bold, FontWeight.Bold), Font(R.font.pt_serif_italic, FontWeight.Normal, androidx.compose.ui.text.font.FontStyle.Italic))
 val Hand = FontFamily(Font(R.font.caveat, FontWeight.Normal))
 
-/** Paper things in the village – the gazette, the album, the house book – keep their own ink whatever the theme. */
+/**
+ * Paper things in the village – the gazette, the album, the house book: old paper by day, the same paper by
+ * lamplight in the dark theme. [note] is a whiter sheet laid on it (a letter, a notebook); [wash] a faint tint.
+ */
 object Ink {
-    val paper = Color(0xFFF2E8D2); val paper2 = Color(0xFFE9DCC0); val ink = Color(0xFF2E2418); val soft = Color(0xFF6E5C45)
-    val rule = Color(0xFFB8A27C); val red = Color(0xFFA8322A); val blue = Color(0xFF2D4A7A)
+    private fun pick(light: Long, dark: Long) = Color(if (C.dark) dark else light)
+    val paper get() = pick(0xFFF2E8D2, 0xFF29241C); val paper2 get() = pick(0xFFE9DCC0, 0xFF332D23)
+    val ink get() = pick(0xFF2E2418, 0xFFEDE3CF); val soft get() = pick(0xFF6E5C45, 0xFFB3A58B)
+    val rule get() = pick(0xFFB8A27C, 0xFF6E6150); val red get() = pick(0xFFA8322A, 0xFFE4877B); val blue get() = pick(0xFF2D4A7A, 0xFFA9C3EE)
+    val green get() = pick(0xFF4F7A3A, 0xFF9CCB86); val note get() = pick(0xFFFBF6EA, 0xFF342E25)
+    /** A faint wash of the ink over the paper, [a] of 255: shading for a card, a track, an empty mount. */
+    fun wash(a: Int) = (if (C.dark) Color.White else Color.Black).copy(alpha = a / 255f * (if (C.dark) .8f else 1f))
     val mast get() = TextStyle(fontFamily = Serif, fontWeight = FontWeight.Bold, fontSize = 27.sp, letterSpacing = 1.5.sp, color = ink)
     val head get() = TextStyle(fontFamily = Serif, fontWeight = FontWeight.Bold, fontSize = 23.sp, lineHeight = 27.sp, color = ink)
     val h3 get() = TextStyle(fontFamily = Serif, fontWeight = FontWeight.Bold, fontSize = 16.sp, lineHeight = 20.sp, color = ink)

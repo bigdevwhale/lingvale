@@ -1,5 +1,6 @@
 package app.lingvale.ui.components
 
+import app.lingvale.ui.theme.Ink
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -48,7 +49,7 @@ fun Dot(color: Color, size: Dp = 10.dp) = Box(Modifier.size(size).clip(CircleSha
 @Composable
 fun Pill(text: String, on: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Box(
-        modifier.clip(RoundedCornerShape(50)).background(if (on) Color(0xFF6B4423) else Color(0x14000000)).clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 8.dp),
+        modifier.clip(RoundedCornerShape(50)).background(if (on) Color(0xFF6B4423) else Ink.wash(0x14)).clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center,
     ) { Text(text, style = app.lingvale.ui.theme.Ink.body.copy(color = if (on) Color(0xFFFFF1D6) else app.lingvale.ui.theme.Ink.ink)) }
 }
@@ -56,7 +57,7 @@ fun Pill(text: String, on: Boolean, onClick: () -> Unit, modifier: Modifier = Mo
 @Composable
 fun Btn(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, soft: Boolean = false) {
     Box(
-        modifier.fillMaxWidth().height(52.dp).clip(RoundedCornerShape(10.dp)).background(if (soft) Color(0x22000000) else Color(0xFF6B4423)).clickable(onClick = onClick),
+        modifier.fillMaxWidth().height(52.dp).clip(RoundedCornerShape(10.dp)).background(if (soft) Ink.wash(0x22) else Color(0xFF6B4423)).clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) { Text(text, style = app.lingvale.ui.theme.Ink.h3.copy(color = if (soft) app.lingvale.ui.theme.Ink.ink else Color(0xFFFFF1D6))) }
 }

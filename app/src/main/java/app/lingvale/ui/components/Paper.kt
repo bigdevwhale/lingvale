@@ -30,7 +30,12 @@ import app.lingvale.ui.theme.Ink
 fun Modifier.paper(): Modifier {
     val tex = Art.get(LocalContext.current, "paper_tex")
     val brush = remember(tex) { tex?.let { ShaderBrush(ImageShader(it, TileMode.Repeated, TileMode.Repeated)) } }
-    return this.background(Ink.paper).let { m -> if (brush != null) m.background(brush, alpha = .9f) else m }
+    // By lamplight the parchment only darkens the paper, so its grain stays and the page stays dark.
+    return this.background(Ink.paper).let { m ->
+        if (brush == null) m
+        else if (app.lingvale.ui.theme.C.dark) m.drawBehind { drawRect(brush, blendMode = androidx.compose.ui.graphics.BlendMode.Multiply) }
+        else m.background(brush, alpha = .9f)
+    }
 }
 
 /** A printed rule: one line, or two close together for a [double] one. */

@@ -55,8 +55,8 @@ fun IconTabs(tabs: List<Pair<String, String>>, selected: Int, onSelect: (Int) ->
 @Composable
 fun RowScope.Tile(icon: String, value: String, caption: String, trend: String? = null, up: Boolean? = null) {
     Column(
-        Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).background(Color(0x14000000))
-            .border(1.dp, Color(0x22000000), RoundedCornerShape(14.dp)).padding(10.dp),
+        Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).background(Ink.wash(0x14))
+            .border(1.dp, Ink.wash(0x22), RoundedCornerShape(14.dp)).padding(10.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             ArtIcon(icon, 30.dp)
@@ -67,7 +67,7 @@ fun RowScope.Tile(icon: String, value: String, caption: String, trend: String? =
         if (trend != null) Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 2.dp)) {
             if (up != null) ArtIcon(if (up) "g_up" else "g_down", 16.dp)
             Spacer(Modifier.width(3.dp))
-            Text(trend, style = Ink.small.copy(color = when (up) { true -> Color(0xFF3F7A3A); false -> Ink.red; null -> Ink.soft }), maxLines = 1)
+            Text(trend, style = Ink.small.copy(color = when (up) { true -> Ink.green; false -> Ink.red; null -> Ink.soft }), maxLines = 1)
         }
     }
 }

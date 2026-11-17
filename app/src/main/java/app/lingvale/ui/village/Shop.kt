@@ -106,7 +106,7 @@ private fun DecorShelves(levelN: Int, balance: Int) {
                         val locked = d.level > levelN
                         val can = !owned && !locked && d.cost <= balance
                         Column(
-                            Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(16.dp)).background(if (owned) Color(0x1F5E8A4E) else Color(0x10000000))
+                            Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(16.dp)).background(if (owned) Color(0x1F5E8A4E) else Ink.wash(0x10))
                                 .clickable(enabled = can) { c.prefs.update { it.copy(spent = it.spent + d.cost, owned = it.owned + d.id) } }
                                 .padding(8.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -116,9 +116,9 @@ private fun DecorShelves(levelN: Int, balance: Int) {
                             Text(d.about, style = Ink.small, textAlign = TextAlign.Center, maxLines = 2, minLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                             Spacer(Modifier.weight(1f).heightIn(min = 6.dp))
                             when {
-                                owned -> Text(tr("✓ в деревне", "✓ in the village"), style = Ink.small.copy(color = Color(0xFF4F7A3A)), maxLines = 1, modifier = Modifier.padding(vertical = 4.dp))
+                                owned -> Text(tr("✓ в деревне", "✓ in the village"), style = Ink.small.copy(color = Ink.green), maxLines = 1, modifier = Modifier.padding(vertical = 4.dp))
                                 locked -> Text(tr("🔒 ${Game.levels[d.level].name}", "🔒 ${Game.levels[d.level].name}"), style = Ink.small, maxLines = 1, modifier = Modifier.padding(vertical = 4.dp))
-                                else -> Row(Modifier.clip(RoundedCornerShape(10.dp)).background(if (can) Color(0xFF6B4423) else Color(0x22000000)).padding(horizontal = 10.dp, vertical = 4.dp),
+                                else -> Row(Modifier.clip(RoundedCornerShape(10.dp)).background(if (can) Color(0xFF6B4423) else Ink.wash(0x22)).padding(horizontal = 10.dp, vertical = 4.dp),
                                     verticalAlignment = Alignment.CenterVertically) {
                                     ArtIcon("icon_firefly", 16.dp); Spacer(Modifier.width(2.dp))
                                     Text("${d.cost}", style = Ink.h3.copy(color = if (can) Color(0xFFFFF1D6) else Ink.soft))
@@ -184,7 +184,7 @@ private fun Shelf(title: String, items: List<app.lingvale.domain.StyleItem>, cho
                 val on = chosen(item)
                 Column(
                     Modifier.weight(1f).fillMaxHeight().clip(RoundedCornerShape(16.dp))
-                        .background(if (on) Color(0x335E8A4E) else Color(0x10000000))
+                        .background(if (on) Color(0x335E8A4E) else Ink.wash(0x10))
                         .then(if (on) Modifier.border(2.dp, Color(0xFF5E8A4E), RoundedCornerShape(16.dp)) else Modifier)
                         .clickable(enabled = owned || can) {
                             if (!owned) c.prefs.update { if (item.key in it.owned) it else it.copy(spent = it.spent + item.cost, owned = it.owned + item.key) }
@@ -198,10 +198,10 @@ private fun Shelf(title: String, items: List<app.lingvale.domain.StyleItem>, cho
                     Text(item.about, style = Ink.small, textAlign = TextAlign.Center, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                     Spacer(Modifier.weight(1f).heightIn(min = 4.dp))
                     when {
-                        on -> Text(tr("✓ выбрано", "✓ chosen"), style = Ink.small.copy(color = Color(0xFF4F7A3A)), maxLines = 1, modifier = Modifier.padding(vertical = 4.dp))
+                        on -> Text(tr("✓ выбрано", "✓ chosen"), style = Ink.small.copy(color = Ink.green), maxLines = 1, modifier = Modifier.padding(vertical = 4.dp))
                         owned -> Text(tr("выбрать", "pick"), style = Ink.small.copy(color = Ink.blue), maxLines = 1, modifier = Modifier.padding(vertical = 4.dp))
                         locked -> Text("🔒 ${Game.levels[item.level].name}", style = Ink.small, maxLines = 1, modifier = Modifier.padding(vertical = 4.dp))
-                        else -> Row(Modifier.clip(RoundedCornerShape(10.dp)).background(if (can) Color(0xFF6B4423) else Color(0x22000000)).padding(horizontal = 10.dp, vertical = 4.dp),
+                        else -> Row(Modifier.clip(RoundedCornerShape(10.dp)).background(if (can) Color(0xFF6B4423) else Ink.wash(0x22)).padding(horizontal = 10.dp, vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically) {
                             ArtIcon("icon_firefly", 16.dp); Spacer(Modifier.width(2.dp))
                             Text("${item.cost}", style = Ink.h3.copy(color = if (can) Color(0xFFFFF1D6) else Ink.soft))

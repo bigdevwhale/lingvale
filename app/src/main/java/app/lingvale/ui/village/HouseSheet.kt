@@ -219,7 +219,7 @@ private fun Room(h: House) {
         }
         said?.let { (i, text) ->
             val (cx, sz) = spots[i]
-            Text(text, style = Ink.body.copy(color = Ink.ink), textAlign = TextAlign.Center,
+            Text(text, style = Ink.body.copy(color = Color(0xFF2E2418)), textAlign = TextAlign.Center,
                 modifier = Modifier.offset(x = (w * cx - w * .28f).coerceAtLeast(6.dp), y = hgt * (.95f - sz) - 34.dp).widthIn(max = w * .56f)
                     .clip(RoundedCornerShape(12.dp)).background(Color(0xF2FFFBEF)).padding(horizontal = 10.dp, vertical = 6.dp))
         }
@@ -237,7 +237,7 @@ private fun Calendar(h: House) {
             drawLine(Color(0xFF6B4A30), androidx.compose.ui.geometry.Offset(size.width / 2, 0f), androidx.compose.ui.geometry.Offset(10f, size.height), 3f)
             drawLine(Color(0xFF6B4A30), androidx.compose.ui.geometry.Offset(size.width / 2, 0f), androidx.compose.ui.geometry.Offset(size.width - 10f, size.height), 3f)
         }
-        Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(Color(0xFFFFFBF0))) {
+        Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp)).background(Ink.note)) {
             Box(Modifier.fillMaxWidth().height(30.dp).background(Color(0xFFB8322A)), contentAlignment = Alignment.Center) {
                 Text(LocalDate.ofEpochDay(mon).let { tr("неделя с ${it.dayOfMonth}-го", "the week of the ${it.dayOfMonth}th") }.uppercase(), style = Ink.caps.copy(color = Color(0xFFFFE9D6)))
             }
@@ -365,7 +365,7 @@ private fun Weeks(h: House) {
                 drawRect(c, androidx.compose.ui.geometry.Offset(x, base - hh), androidx.compose.ui.geometry.Size(cw * .6f, hh))
                 // hatching, like a pen drawing
                 var k = 0f
-                while (k < hh) { drawLine(Color(0x33000000), androidx.compose.ui.geometry.Offset(x, base - k), androidx.compose.ui.geometry.Offset(x + cw * .6f, base - k - cw * .3f), 1.2f); k += 6f }
+                while (k < hh) { drawLine(Ink.wash(0x33), androidx.compose.ui.geometry.Offset(x, base - k), androidx.compose.ui.geometry.Offset(x + cw * .6f, base - k - cw * .3f), 1.2f); k += 6f }
             }
         }
         Row {
@@ -423,7 +423,7 @@ private fun Residents(h: House) {
 @Composable
 private fun Book(h: House) {
     val events = h.snap!!.events.sortedByDescending { it.at }.take(9)
-    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(4.dp)).background(Color(0xFFFBF6EA)).ruled(28.dp).padding(start = 36.dp, end = 10.dp, top = 4.dp, bottom = 8.dp)) {
+    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(4.dp)).background(Ink.note).ruled(28.dp).padding(start = 36.dp, end = 10.dp, top = 4.dp, bottom = 8.dp)) {
         if (events.isEmpty()) Text(tr("Страница пока чистая.", "The page is still blank."), style = Ink.hand, modifier = Modifier.height(28.dp))
         events.forEach { e ->
             val title = e.title.ifBlank { h.home.untitled }
@@ -446,7 +446,7 @@ private fun WeekSeals(h: House) {
             Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(weekdayShort(d), style = Ink.caps.copy(color = if (d == today()) Ink.red else Ink.soft))
                 Box(Modifier.size(34.dp), contentAlignment = Alignment.Center) {
-                    if (di != null) ArtIcon("seal", 32.dp) else Box(Modifier.size(8.dp).clip(CircleShape).background(if (d <= today()) Ink.rule else Color(0x14000000)))
+                    if (di != null) ArtIcon("seal", 32.dp) else Box(Modifier.size(8.dp).clip(CircleShape).background(if (d <= today()) Ink.rule else Ink.wash(0x14)))
                 }
                 Text(if (di != null) (if (h.home.minutes && di.min > 0) "${di.min}′" else "${di.n}") else " ", style = Ink.small)
             }

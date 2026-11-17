@@ -11,6 +11,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -197,11 +198,46 @@ private fun DrawScope.img(b: ImageBitmap, cx: Float, foot: Float, w: Float, filt
 
 
 /**
+ * The lower valley, below the end of the picture, for a village of more houses than the map holds: the same valley
+ * mirrored, so the path and the stream run on, with three rows of clearings (centre x, foot line in heights of the map).
+ */
+private val LOWER = listOf(.21f to .30f, .79f to .31f, .20f to .60f, .80f to .59f, .21f to .88f, .79f to .87f)
+/** How far the lower valley reaches for [rows] rows of clearings, in heights of the map: just past their residents. */
+private fun lowerHeight(rows: Int) = when (rows) { 1 -> .40f; 2 -> .69f; else -> .95f }
+/** How many houses stand on the map before the lower valley opens. */
+private const val UPPER = 8
+
+/**
  * The village map. [owned] decorations stand where they belong (out of the houses' way); [fair] hangs flags; [chats]
- * float over the houses one at a time. Tapping a house calls [onHouse].
+ * float over the houses one at a time. Tapping a house calls [onHouse]. When the houses and the build plot don't fit
+ * the map, the first [UPPER] stay on it and the rest go to the lower valley right below, reached by scrolling.
  */
 @Composable
 fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boolean, chats: List<Chat>, onHouse: (House) -> Unit, modifier: Modifier = Modifier, onBuild: (() -> Unit)? = null, style: Styling = Styling()) {
+    var n by remember(chats) { mutableIntStateOf(0) }
+    LaunchedEffect(chats) { if (!BuildConfig.SHOTS) while (true) { delay(5200); n++ } }
+    val chat = if (chats.isEmpty()) null else chats[n % chats.size]
+    val count = houses.size + if (onBuild != null) 1 else 0
+    if (count <= LAYOUTS.size) {
+        Valley(houses, if (onBuild != null) houses.size else -1, spots(count), houseScale(count), 1f, false, art, owned, fair, chat, onHouse, onBuild, style, modifier)
+        return
+    }
+    val rest = houses.drop(UPPER).take(LOWER.size)
+    val free = if (onBuild != null && rest.size < LOWER.size) rest.size else -1
+    val m = rest.size + if (free >= 0) 1 else 0
+    Column(modifier) {
+        Valley(houses.take(UPPER), -1, LAYOUTS[UPPER - 1], 1f, 1f, false, art, owned, fair, chat, onHouse, null, style)
+        Valley(rest, free, LOWER.take(m), 1f, lowerHeight((m + 1) / 2), true, art, emptySet(), false, chat, onHouse, onBuild, style)
+    }
+}
+
+/**
+ * One stretch of the valley, [height] heights of the map tall; [mirrored] for the lower valley. All the positions
+ * are in widths and heights of the whole map, so a house looks the same on either stretch.
+ */
+@Composable
+private fun Valley(placed: List<House>, free: Int, spots: List<Pair<Float, Float>>, sc: Float, height: Float, mirrored: Boolean, art: ArtStore,
+                   owned: Set<String>, fair: Boolean, chat: Chat?, onHouse: (House) -> Unit, onBuild: (() -> Unit)?, style: Styling, modifier: Modifier = Modifier) {
     val ctx = LocalContext.current
     // The time of day follows the phone's clock, checked every half minute.
     val clock by produceState(hourFrac()) { if (!BuildConfig.SHOTS) while (true) { delay(30_000); value = hourFrac() } }
@@ -209,21 +245,16 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
     val night = hour >= 21 || hour < 5
     val sleep = hour >= 23 || hour < 6
     val dimFilter = remember(clock) { tint(clock)?.let { ColorFilter.lighting(it, Color.Black) } }
-    val placed = houses.take(LAYOUTS.size)
-    val free = if (onBuild != null && placed.size < LAYOUTS.size) placed.size else -1
-    val count = placed.size + if (free >= 0) 1 else 0
-    val spots = spots(count)
-    val sc = houseScale(count)
     val houseW = HOUSE_W * sc
     val decor = remember(owned, spots, sc) { decorPlaces(owned, spots, sc) }
     val time by rememberTime()
     val campfire = "campfire" in owned
     val measurer = androidx.compose.ui.text.rememberTextMeasurer()
     val plaqueStyle = T.tiny.copy(color = Color(0xFF3A2E22))
-    BoxWithConstraints(modifier.fillMaxWidth().aspectRatio(MAP_RATIO)) {
+    BoxWithConstraints(modifier.fillMaxWidth().aspectRatio(MAP_RATIO / height)) {
         Canvas(Modifier.fillMaxSize().clipToBounds().pointerInput(placed, spots) {
             detectTapGestures { o ->
-                val fx = o.x / size.width; val fy = o.y / size.height
+                val fx = o.x / size.width; val fy = o.y / (size.width / MAP_RATIO)
                 if (free >= 0) { val (x, y) = spots[free]; if (abs(fx - x) < houseW / 2 && fy in (y - .12f * sc)..(y + .03f)) { onBuild?.invoke(); return@detectTapGestures } }
                 placed.forEachIndexed { i, h ->
                     val (x, y) = spots[i]
@@ -231,12 +262,15 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
                 }
             }
         }) {
-            val w0 = size.width; val h0 = size.height
-            Art.get(ctx, Style.valley(style.bg))?.let { drawImage(it, IntOffset.Zero, IntSize(it.width, it.height), IntOffset.Zero, IntSize(w0.roundToInt(), h0.roundToInt()), colorFilter = dimFilter, filterQuality = FilterQuality.Low) }
-            val t = time
-            Style.paths.firstOrNull { it.id == style.path && it.art.isNotEmpty() }?.let { p ->
-                Art.get(ctx, p.art)?.let { drawImage(it, IntOffset.Zero, IntSize(it.width, it.height), IntOffset.Zero, IntSize(w0.roundToInt(), h0.roundToInt()), colorFilter = dimFilter, filterQuality = FilterQuality.Low) }
+            val w0 = size.width; val h0 = w0 / MAP_RATIO
+            // The valley picture, and the path over it, fill the whole map's height; the lower valley shows them upside down.
+            withTransform({ if (mirrored) scale(1f, -1f, Offset(w0 / 2, h0 / 2)) }) {
+                Art.get(ctx, Style.valley(style.bg))?.let { drawImage(it, IntOffset.Zero, IntSize(it.width, it.height), IntOffset.Zero, IntSize(w0.roundToInt(), h0.roundToInt()), colorFilter = dimFilter, filterQuality = FilterQuality.Low) }
+                Style.paths.firstOrNull { it.id == style.path && it.art.isNotEmpty() }?.let { p ->
+                    Art.get(ctx, p.art)?.let { drawImage(it, IntOffset.Zero, IntSize(it.width, it.height), IntOffset.Zero, IntSize(w0.roundToInt(), h0.roundToInt()), colorFilter = dimFilter, filterQuality = FilterQuality.Low) }
+                }
             }
+            val t = time
 
             // Everything that stands, drawn from the back (top) to the front (bottom).
             class Thing(val foot: Float, val draw: DrawScope.() -> Unit)
@@ -346,16 +380,14 @@ fun VillageMap(houses: List<House>, art: ArtStore, owned: Set<String>, fair: Boo
                 drawCircle(Color(1f, .95f, .6f, a), w0 * .004f, Offset(fx * w0, fy * h0))
             }
         }
-        // A resident speaks: one line at a time over its house.
-        if (chats.isNotEmpty()) {
-            var n by remember(chats) { mutableIntStateOf(0) }
-            LaunchedEffect(chats) { if (!BuildConfig.SHOTS) while (true) { delay(5200); n++ } }
-            val c = chats[n % chats.size]
+        // A resident speaks: one line at a time over its house, on whichever stretch of the valley it lives.
+        if (chat != null) {
+            val c = chat
             val i = placed.indexOfFirst { it.home.id == c.house }
             if (i >= 0) {
                 val (x, y) = spots[i]
                 AnimatedContent(c, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "chat",
-                    modifier = Modifier.offset(x = maxWidth * (x - .26f).coerceIn(.02f, .46f), y = (maxHeight * (y - .22f * sc)).coerceAtLeast(6.dp))) { cc ->
+                    modifier = Modifier.offset(x = maxWidth * (x - .26f).coerceIn(.02f, .46f), y = (maxWidth / MAP_RATIO * (y - .22f * sc)).coerceAtLeast(6.dp))) { cc ->
                     Text(cc.text, style = T.smallB.copy(color = Color(0xFF2B2A25)), textAlign = TextAlign.Center,
                         modifier = Modifier.widthIn(max = maxWidth * .52f).clip(RoundedCornerShape(12.dp)).background(Color(0xF2FFFBEF)).padding(horizontal = 10.dp, vertical = 6.dp))
                 }

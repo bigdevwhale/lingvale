@@ -165,7 +165,7 @@ private fun Paper(live: List<House>, day: Long, onDay: (Long) -> Unit) {
     }
     if (issue.notices.isNotEmpty()) {
         Gap(16.dp)
-        Column(Modifier.fillMaxWidth().background(Color(0x14000000)).padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().background(Ink.wash(0x14)).padding(12.dp)) {
             Text(tr("ОБЪЯВЛЕНИЯ", "NOTICES"), style = Ink.caps)
             Gap(4.dp)
             issue.notices.forEach { Text("· $it", style = Ink.body, modifier = Modifier.padding(vertical = 2.dp)) }
@@ -226,7 +226,7 @@ private fun Quilt(live: List<House>, onIssue: (Long) -> Unit) {
             val o = Offset(k * cell + gap / 2, w * cell + gap / 2)
             val hs = busy[d].orEmpty()
             when (hs.size) {
-                0 -> { drawRect(linen, o, Size(s, s)); var y = o.y + s * .1f; while (y < o.y + s) { drawLine(Color(0x22000000), Offset(o.x, y), Offset(o.x + s, y), 1f); y += s * .1f } }
+                0 -> { drawRect(linen, o, Size(s, s)); var y = o.y + s * .1f; while (y < o.y + s) { drawLine(Ink.wash(0x22), Offset(o.x, y), Offset(o.x + s, y), 1f); y += s * .1f } }
                 1 -> fabric(Color(hs[0].home.color), kinds[hs[0].home.id] ?: 0, o, s)
                 2 -> {
                     fabric(Color(hs[0].home.color), kinds[hs[0].home.id] ?: 0, o, s, Path().apply { moveTo(o.x, o.y); lineTo(o.x + s, o.y); lineTo(o.x, o.y + s); close() })

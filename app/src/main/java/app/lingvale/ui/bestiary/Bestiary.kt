@@ -75,7 +75,7 @@ fun BestiaryScreen(houses: List<House>) {
         Text(tr("Альбом марок", "The stamp album"), style = Ink.head.copy(fontSize = 28.sp))
         Text(if (live.isEmpty()) tr("Марки появятся, когда в деревню переедет первый дом", "Stamps come when the first house moves in") else tr("собрано $met из $total", "$met of $total collected"), style = Ink.handBig)
         if (live.isEmpty()) return@Column
-        Box(Modifier.padding(top = 4.dp).fillMaxWidth().height(6.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(3.dp)).background(Color(0x1A000000))) {
+        Box(Modifier.padding(top = 4.dp).fillMaxWidth().height(6.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(3.dp)).background(Ink.wash(0x1A))) {
             Box(Modifier.fillMaxWidth(if (total == 0) 0f else met.toFloat() / total).height(6.dp).background(Ink.red))
         }
         Gap(12.dp)
@@ -110,7 +110,7 @@ private fun Stamp(h: House, sp: SpeciesInfo, no: Int, best: PetInfo?, modifier: 
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         BoxWithConstraints(Modifier.fillMaxWidth().aspectRatio(.84f)) {
             val w = maxWidth
-            Box(Modifier.fillMaxSize().padding(horizontal = w * .1f, vertical = w * .1f).background(if (best != null) pale(sp.color) else Color(0x0F000000)))
+            Box(Modifier.fillMaxSize().padding(horizontal = w * .1f, vertical = w * .1f).background(if (best != null) pale(sp.color) else Ink.wash(0x0F)))
             if (best != null) {
                 Sprite(h.pkg!!, sp.id, best.stage, w * .74f, Modifier.align(Alignment.Center).offset(y = w * .04f), shiny = best.shiny)
                 ArtIcon("postmark", w * .42f, Modifier.align(Alignment.TopEnd).offset(x = w * .04f, y = -w * .02f).alpha(.45f).rotate(-12f))

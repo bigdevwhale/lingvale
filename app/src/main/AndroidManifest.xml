@@ -31,6 +31,9 @@
         <package android:name="app.reelkin" />
         <package android:name="app.reelkin.dev" />
         <package android:name="app.reelkin.demo" />
+        <package android:name="app.wildling" />
+        <package android:name="app.wildling.dev" />
+        <package android:name="app.wildling.demo" />
     </queries>
 
     <application

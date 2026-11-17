@@ -30,6 +30,8 @@ SKINS = {
                 "a cosy round stone library tower with a domed copper roof, a big round stained-glass window with flower patterns only, a chimney of stacked books"),
     "cinema": ("an open-air cinema in a red-and-white striped circus tent, a film projector on a little pole in front, strings of bunting",
                "a grand art-deco movie palace with golden trim, a tall vertical sign covered only in light bulbs (NO letters), a red carpet at the door"),
+    "lodge": ("a little log cabin raised on tall wooden stilts above the grass, a ladder up to a small porch with a lantern, a pointed shingle roof with moss",
+              "a wooden forest watchtower with a cosy closed cabin on top, a pitched roof, a lantern in the window, a long ladder and a small woodshed at its foot"),
 }
 
 

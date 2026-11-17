@@ -16,7 +16,7 @@ Each of our apps has its own pet and its own home. Puffling's puffins live in a 
 
 ## What's inside
 
-- **The valley.** A pixel map with a path and a stream. Each clearing takes a house: the tea house, the basement gym, the burrow, the cinema, the academy tower, the tavern, the studio, the writing desk or the reading room. The house's team walks in front of it, and at night its windows are lit if something happened there this week.
+- **The valley.** A pixel map with a path and a stream. Each clearing takes a house: the tea house, the basement gym, the burrow, the cinema, the academy tower, the tavern, the studio, the writing desk, the reading room or the lodge. When the houses outgrow the map, the valley goes on below. The house's team walks in front of it, and at night its windows are lit if something happened there this week.
 - **Fireflies.** Everything you do in the apps brings the village fireflies, and more when two or three houses are busy on the same day. The shop sells a well, lamps, a windmill and a hot air balloon for them. The more fireflies gathered, the bigger the village grows, from a hamlet to a small town.
 - **Weekly tasks.** Three each week, such as "Two houses busy on the same day, three times".
 - **A look inside.** The app's own room with its pets, the week in wax seals, how much was done this week and month, streaks, mornings or evenings, every resident and the house's book.
@@ -25,7 +25,7 @@ Each of our apps has its own pet and its own home. Puffling's puffins live in a 
 
 ## Which apps move in
 
-Puffling, Pumpling, Pennyling, Reelkin, Inkling, Questling, Songling, Keyling and Familiar, in the versions released alongside Lingvale 1.0 or newer.
+Puffling, Pumpling, Pennyling, Reelkin, Inkling, Questling, Songling, Keyling and Familiar, in the versions released alongside Lingvale 1.0 or newer, and Wildling from 1.0.
 
 ## How it works
 

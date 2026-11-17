@@ -6,6 +6,21 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.3.0] - 2026-11-17
+
+### Added
+- **Wildling moves in:** its lodge stands in the valley with the wild beasts and shy creatures of your habits. A day counts habits done, cravings sat out and journal pages. The shop sells two more designs for it, the stilt cabin and the watchtower.
+- **The valley goes on below:** the map held nine houses. Now the first eight stay on it, and the rest, with the build plot, move to the lower valley, where the path and the stream run on. Scroll down to reach it.
+
+### Fixed
+- **The dark theme works:** the paper screens (the bottom bar, the album, Days, the house pages, the shop and the settings) kept their light paper whatever the theme. Now the dark theme turns them into the same paper by lamplight. The village map keeps its own day and night by the clock.
+
+<!-- tg
+В долину переезжает Wildling: его сторожка с дикими зверями и пугливыми зверьками ваших привычек.
+Когда домам тесно, долина продолжается вниз – прокрутите карту.
+Тёмная тема теперь действительно тёмная.
+-->
+
 ## [1.2.2] - 2026-11-17
 
 ### Fixed

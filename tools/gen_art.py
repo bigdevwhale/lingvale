@@ -45,6 +45,8 @@ HOUSES = {
             "small windows on the sides, a quill pen weathervane, a stack of paper by the door",
     "reading": "a crooked whimsical reading hut built from stacked giant old books, a pointed violet roof like a witch hat, a round window, "
                "a candle lantern by the door, a crescent moon weathervane, a few loose pages",
+    "lodge": "a small cozy log lodge at the edge of a forest: walls of dark round logs, a steep mossy shingle roof, a wide porch with a lantern "
+             "hanging by the door, a stone chimney, a neat pile of firewood, a low wooden fence with an open gate, a few pinecones on the porch steps",
 }
 
 

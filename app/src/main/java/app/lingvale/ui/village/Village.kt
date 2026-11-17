@@ -133,7 +133,8 @@ fun VillageScreen(houses: List<House>, onHouse: (House) -> Unit, onSettings: () 
         }
         BoxWithConstraints(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
             val w = minOf(maxWidth, maxHeight * MAP_RATIO)
-            Box(Modifier.width(w)) { VillageMap(houses, c.art, pr.owned, fair, chats, onHouse, onBuild = onBuild, style = style) }
+            // The map fits the screen; a bigger village goes on into the lower valley, scrolled to.
+            Box(Modifier.width(w).verticalScroll(rememberScrollState())) { VillageMap(houses, c.art, pr.owned, fair, chats, onHouse, onBuild = onBuild, style = style) }
         }
         if (live.isEmpty()) {
             Text(if (onBuild != null) tr("Долина пока пустая. Нажмите на участок «+ Построить» и выберите первый дом.", "The valley is empty. Tap the «+ Build» plot and pick the first house.")
@@ -167,7 +168,7 @@ fun VillageScreen(houses: List<House>, onHouse: (House) -> Unit, onSettings: () 
 /** One of the three buttons under the map: a picture, a figure, a word. */
 @Composable
 private fun RowScope.Action(icon: String, value: String, label: String, alert: Boolean = false, onClick: () -> Unit) {
-    Row(Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).background(if (alert) Color(0x33A8322A) else Color(0x14000000)).clickable(onClick = onClick).padding(horizontal = 8.dp, vertical = 6.dp),
+    Row(Modifier.weight(1f).clip(RoundedCornerShape(14.dp)).background(if (alert) Color(0x33A8322A) else Ink.wash(0x14)).clickable(onClick = onClick).padding(horizontal = 8.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically) {
         ArtIcon(icon, 34.dp)
         Spacer(Modifier.width(6.dp))
@@ -311,7 +312,7 @@ private fun Board(live: List<House>) {
 @Composable
 private fun Letter(live: List<House>) {
     PaperSection(tr("Письмо о прошлой неделе", "A letter about last week")) {
-        Text(Game.letter(live), style = Ink.hand, modifier = Modifier.fillMaxWidth().background(Color(0xFFFBF6EA)).ruled(24.dp).padding(start = 36.dp, end = 10.dp, top = 2.dp, bottom = 6.dp))
+        Text(Game.letter(live), style = Ink.hand, modifier = Modifier.fillMaxWidth().background(Ink.note).ruled(24.dp).padding(start = 36.dp, end = 10.dp, top = 2.dp, bottom = 6.dp))
     }
 }
 

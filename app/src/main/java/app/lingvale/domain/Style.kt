@@ -49,6 +49,7 @@ object Style {
         Look.DESK to listOf("Маяк" to "Lighthouse", "Печатная машинка" to "Typewriter"),
         Look.READING to listOf("Дом на дереве" to "Treehouse", "Круглая библиотека" to "Round library"),
         Look.CINEMA to listOf("Летний кинотеатр" to "Open-air cinema", "Кинодворец" to "Movie palace"),
+        Look.LODGE to listOf("Избушка на сваях" to "Stilt cabin", "Наблюдательная вышка" to "Watchtower"),
     )
 
     /** The designs of house [id] with look [look]: the original (0) and the two from the shop. */

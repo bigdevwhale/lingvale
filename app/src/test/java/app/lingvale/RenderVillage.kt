@@ -39,7 +39,7 @@ import java.time.ZoneId
 import kotlin.random.Random
 
 /**
- * A full village of eight houses drawn to app/build/art/village (run with `-Prender`): the layout where the reading
+ * A village of eight houses, and one of every house, drawn to app/build/art/village (run with `-Prender`): the layout where the reading
  * room stands under the cinema (#2), and the weekly tasks with every hint open. Apps whose pets are painted in code
  * borrow a sibling's pet pictures; only where the residents stand matters here.
  */
@@ -51,7 +51,7 @@ class RenderVillage {
     private val out = File(System.getProperty("render.out") ?: "build/art", "village").apply { mkdirs() }
     private val repos = File("../..").canonicalFile
     private val order = listOf("reelkin", "songling", "familiar", "inkling", "questling", "puffling", "pumpling", "pennyling")
-    private val artOf = mapOf("reelkin" to "questling", "songling" to "puffling", "familiar" to "inkling")
+    private val artOf = mapOf("reelkin" to "questling", "songling" to "puffling", "familiar" to "inkling", "keyling" to "pumpling")
 
     private fun settle() = repeat(8) { rule.mainClock.advanceTimeBy(400); Thread.sleep(200); org.robolectric.shadows.ShadowLooper.idleMainLooper() }
     private fun shot(name: String) {
@@ -74,7 +74,12 @@ class RenderVillage {
         return Snap(app, "1.0", true, "room_bg", pets, species, days, events)
     }
 
-    @Test fun render() {
+    @Test fun render() = render(order, "")
+
+    /** Every house of the family built: the map's eight and the rest in the lower valley, scrolled down to. */
+    @Test fun renderFull() = render(Family.all.map { it.id }, "full-")
+
+    private fun render(order: List<String>, prefix: String) {
         Lang.ru = true
         val c = ApplicationProvider.getApplicationContext<LingvaleApp>().container
         c.prefs.welcomed = true
@@ -95,7 +100,7 @@ class RenderVillage {
         rule.setContent { key(idx) { ValeTheme(false) { Box(Modifier.background(Ink.paper)) { shots[idx].second() } } } }
         shots.forEachIndexed { i, (name, _) ->
             if (i > 0) rule.runOnUiThread { idx = i }
-            shot(name)
+            shot(prefix + name)
         }
     }
 }

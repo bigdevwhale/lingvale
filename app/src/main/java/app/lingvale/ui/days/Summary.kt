@@ -132,8 +132,8 @@ private fun Timeline(live: List<House>, day: Long) {
                 Spacer(Modifier.width(6.dp))
                 Canvas(Modifier.weight(1f).height(24.dp)) {
                     val w = size.width
-                    drawRoundRect(Color(0x10000000), Offset(0f, 4f), Size(w, size.height - 8f), CornerRadius(8f))
-                    for (hr in 9..21 step 3) { val x = w * (hr - 6) / 18f; drawLine(Color(0x22000000), Offset(x, 4f), Offset(x, size.height - 4f), 1f) }
+                    drawRoundRect(Ink.wash(0x10), Offset(0f, 4f), Size(w, size.height - 8f), CornerRadius(8f))
+                    for (hr in 9..21 step 3) { val x = w * (hr - 6) / 18f; drawLine(Ink.wash(0x22), Offset(x, 4f), Offset(x, size.height - 4f), 1f) }
                     events.forEach { e ->
                         val t = Instant.ofEpochMilli(e.at).atZone(zone)
                         val hour = (t.hour + t.minute / 60f).coerceIn(6f, 24f)
