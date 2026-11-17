@@ -223,17 +223,21 @@ private fun Quests(live: List<House>) {
     val pr by c.prefs.progress.collectAsState()
     val week = mondayOf(today())
     val qs = remember(live) { Game.quests(live) }
+    var open by remember { mutableStateOf<String?>(null) }
     PaperSection(tr("Задания недели", "This week's tasks")) {
         Column {
+            Text(tr("Считаются дела в приложениях, чьи дома стоят в деревне, с понедельника по воскресенье. Нажмите на задание – подскажу, как его выполнить.",
+                "What counts is what you do in the apps whose houses stand in the village, Monday to Sunday. Tap a task to see how to do it."), style = Ink.small)
             qs.forEach { q ->
                 val key = "$week:${q.id}"
                 val claimed = key in pr.claimed
-                Row(Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth().clickable { open = if (open == q.id) null else q.id }.padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                     ArtIcon("icon_scroll", 40.dp, Modifier.alpha(if (claimed) .5f else 1f))
                     Spacer(Modifier.width(10.dp))
                     Column(Modifier.weight(1f)) {
                         Text(q.title, style = Ink.h3.copy(color = if (claimed) Ink.soft else Ink.ink))
                         Text(tr("${minOf(q.have, q.goal)} из ${q.goal} · награда ${q.reward}", "${minOf(q.have, q.goal)} of ${q.goal} · reward ${q.reward}"), style = Ink.hand.copy(color = if (claimed) Ink.rule else Ink.blue))
+                        if (open == q.id) Text(q.hint, style = Ink.small, modifier = Modifier.padding(top = 4.dp))
                     }
                     when {
                         claimed -> ArtIcon("postmark", 46.dp, Modifier.alpha(.7f))

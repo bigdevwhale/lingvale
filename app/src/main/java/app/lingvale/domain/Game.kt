@@ -20,8 +20,27 @@ data class Decor(val id: String, val ru: String, val en: String, val aboutRu: St
 /** A weekly village task, made of what the apps did. */
 data class Quest(val id: String, val ru: String, val en: String, val goal: Int, val reward: Int, val have: Int) {
     val title get() = tr(ru, en)
+    /** How to do it, shown when the task is tapped. */
+    val hint get() = tr(HINTS_RU[id].orEmpty(), HINTS_EN[id].orEmpty())
     val done get() = have >= goal
 }
+
+private val HINTS_RU = mapOf(
+    "pair" to "Сделайте хотя бы одно дело в двух разных приложениях в один и тот же день. Нужно три таких дня.",
+    "trio" to "Сделайте хотя бы одно дело в трёх разных приложениях в один и тот же день.",
+    "each" to "Сделайте хотя бы одно дело в каждом приложении, чей дом стоит в деревне.",
+    "five" to "Пять разных дней, когда хотя бы в одном приложении было сделано хоть что-то.",
+    "hour" to "Складывается время в приложениях за неделю: дыхание, тренировки, учёба, чтение, музыка, фильмы и игры. Нужно 90 минут.",
+    "morning" to "Сделайте дело в любом приложении до 9 утра. Нужно два раза.",
+)
+private val HINTS_EN = mapOf(
+    "pair" to "Do at least one thing in two different apps on the same day. Three such days are needed.",
+    "trio" to "Do at least one thing in three different apps on the same day.",
+    "each" to "Do at least one thing in every app whose house stands in the village.",
+    "five" to "Five different days with at least something done in one of the apps.",
+    "hour" to "The time spent in the apps this week adds up: breathing, workouts, study, reading, music, films and games. 90 minutes are needed.",
+    "morning" to "Do something in any of the apps before 9 am. Twice.",
+)
 
 /** Something a resident says, above its house [house]. */
 data class Chat(val house: String, val text: String)
