@@ -16,6 +16,7 @@ import app.lingvale.domain.Lang
 import app.lingvale.ui.Root
 import app.lingvale.ui.Start
 import app.lingvale.ui.theme.ValeTheme
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
             Start.tab = intent.getIntExtra("tab", 0); Start.open = intent.getStringExtra("open")
             if (BuildConfig.SHOTS) container.prefs.welcomed = true
         }
+        debugMove(intent)
         setContent {
             val theme by container.prefs.theme.collectAsState()
             val sys = isSystemInDarkTheme()
@@ -37,6 +39,30 @@ class MainActivity : AppCompatActivity() {
                 enableEdgeToEdge(statusBarStyle = if (dark) SystemBarStyle.dark(t) else SystemBarStyle.light(t, t), navigationBarStyle = if (dark) SystemBarStyle.dark(t) else SystemBarStyle.light(t, t))
             }
             ValeTheme(dark) { Root() }
+        }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) { super.onNewIntent(intent); debugMove(intent) }
+
+    /**
+     * Debug builds: `adb shell am start -n app.lingvale.dev/app.lingvale.MainActivity --es move save` writes the moving
+     * file to files/moving.zip, `--es move load` loads it with every line ticked, `--es move pick` only opens it for the
+     * settings to show; the outcome goes to logcat (tag lingvale).
+     */
+    private fun debugMove(intent: android.content.Intent) {
+        if (!BuildConfig.DEBUG || BuildConfig.DEMO) return
+        val what = intent.getStringExtra("move") ?: return
+        val m = container.mover
+        val uri = android.net.Uri.fromFile(java.io.File(filesDir, "moving.zip"))
+        container.scope.launch {
+            val busy = setOf(app.lingvale.data.Stage.SAVING, app.lingvale.data.Stage.LOADING)
+            m.reset()
+            if (what == "save") m.save(uri) else {
+                m.pick(uri)
+                if (m.state.first { it.stage != app.lingvale.data.Stage.IDLE }.stage == app.lingvale.data.Stage.PICKED && what == "load") m.load()
+            }
+            val end = m.state.first { it.stage !in busy && it.stage != app.lingvale.data.Stage.IDLE && (what == "pick" || it.stage != app.lingvale.data.Stage.PICKED) }
+            android.util.Log.i("lingvale", "move $what: ${end.stage} ${end.error} " + end.lines.joinToString { "${it.id}=${it.mark}" })
         }
     }
 

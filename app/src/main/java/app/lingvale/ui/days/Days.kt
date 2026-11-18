@@ -137,7 +137,7 @@ private fun Paper(live: List<House>, day: Long, onDay: (Long) -> Unit) {
                         val lead = p.house.snap!!.team.firstOrNull()
                         Row(verticalAlignment = Alignment.Bottom) {
                             ArtIcon(p.house.art(0), 54.dp)
-                            if (lead != null && p.house.pkg != null) Sprite(p.house.pkg, lead.species, lead.stage, 40.dp, shiny = lead.shiny)
+                            if (lead != null && p.house.pkg != null) Sprite(p.house.pkg, lead.species, lead.stage, 40.dp, shiny = lead.shiny, frame = lead.frame)
                         }
                         Text(p.title, style = Ink.h3)
                         Text(p.text, style = Ink.body)

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Cottage
@@ -123,7 +124,7 @@ private fun SettingsSheet(onClose: () -> Unit) {
     val theme by c.prefs.theme.collectAsState()
     ModalBottomSheet(onDismissRequest = onClose, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = app.lingvale.ui.theme.Ink.paper, contentWindowInsets = { androidx.compose.foundation.layout.WindowInsets(0) }) {
         androidx.compose.foundation.layout.Box(Modifier.sheetMax()) {
-        Column(Modifier.fillMaxWidth().paper().padding(horizontal = 20.dp).navigationBarsPadding().padding(bottom = 20.dp)) {
+        Column(Modifier.fillMaxWidth().paper().verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(horizontal = 20.dp).navigationBarsPadding().padding(bottom = 20.dp)) {
             Text(tr("Настройки", "Settings"), style = app.lingvale.ui.theme.Ink.head)
             app.lingvale.ui.components.PaperSection(tr("Тема", "Theme")) {}
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -138,9 +139,10 @@ private fun SettingsSheet(onClose: () -> Unit) {
                 Pill("Русский", lang == "ru", { setLanguage("ru") })
                 Pill("English", lang == "en", { setLanguage("en") })
             }
+            MovingSection()
             app.lingvale.ui.components.PaperSection(tr("О деревне", "About")) {}
-            Text(tr("Lingvale только читает: питомцев и дни берёт у самих приложений, ничего в них не меняет и никуда не отправляет. Всё остаётся на телефоне.",
-                "Lingvale only reads: it takes the pets and days from the apps themselves, changes nothing in them and sends nothing anywhere. Everything stays on the phone."), style = app.lingvale.ui.theme.Ink.body)
+            Text(tr("Lingvale берёт питомцев и дни у самих приложений и никуда их не отправляет: всё остаётся на телефоне. В приложениях она ничего не меняет, кроме одного случая: когда вы сами загружаете файл переезда.",
+                "Lingvale takes the pets and days from the apps themselves and sends nothing anywhere: everything stays on the phone. It changes nothing in the apps, with one exception: when you load a moving file yourself."), style = app.lingvale.ui.theme.Ink.body)
         }
         }
     }

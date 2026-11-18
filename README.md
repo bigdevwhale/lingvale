@@ -16,20 +16,23 @@ Each of our apps has its own pet and its own home. Puffling's puffins live in a 
 
 ## What's inside
 
-- **The valley.** A pixel map with a path and a stream. Each clearing takes a house: the tea house, the basement gym, the burrow, the cinema, the academy tower, the tavern, the studio, the writing desk, the reading room or the lodge. When the houses outgrow the map, the valley goes on below. The house's team walks in front of it, and at night its windows are lit if something happened there this week.
+- **The valley.** A pixel map with a path and a stream. Each clearing takes a house: the tea house, the basement gym, the burrow, the cinema, the academy tower, the tavern, the studio, the writing desk, the reading room, the lodge or the gatehouse. When the houses outgrow the map, the valley goes on below. The house's team walks in front of it, and at night its windows are lit if something happened there this week.
 - **Fireflies.** Everything you do in the apps brings the village fireflies, and more when two or three houses are busy on the same day. The shop sells a well, lamps, a windmill and a hot air balloon for them. The more fireflies gathered, the bigger the village grows, from a hamlet to a small town.
 - **Weekly tasks.** Three each week, such as "Two houses busy on the same day, three times".
 - **A look inside.** The app's own room with its pets, the week in wax seals, how much was done this week and month, streaks, mornings or evenings, every resident and the house's book.
 - **The stamp album.** Every creature of every house: the ones you've met are franked, the rest wait in empty mounts.
+- **Moving house.** One file with the backups of every installed app of the family and the village itself. On a new phone install the apps, open the file in Lingvale's settings, and each app gets its own back.
 - **Days.** The day hour by hour, the week by house, which houses tend to be busy together, a village gazette and a patchwork quilt of the year.
 
 ## Which apps move in
 
-Puffling, Pumpling, Pennyling, Reelkin, Inkling, Questling, Songling, Keyling and Familiar, in the versions released alongside Lingvale 1.0 or newer, and Wildling from 1.0.
+Puffling, Pumpling, Pennyling, Reelkin, Inkling, Questling, Songling, Keyling and Familiar, in the versions released alongside Lingvale 1.0 or newer, and Wildling and Roamling from 1.0.
 
 ## How it works
 
-Every app has a small read-only bridge. Lingvale asks it for the pets, the days and the last week's events, and the app answers only a Lingvale signed with our key. Lingvale changes nothing in the apps and sends nothing anywhere.
+Every app has a small bridge. Lingvale asks it for the pets, the days and the last week's events, and the app answers only a Lingvale signed with our key. Lingvale sends nothing anywhere.
+
+For a move, Lingvale asks each app to write its own backup, the same file its settings save, and packs them into one zip (`lingvale.json` and `apps/<app>.json` or `.zip`). Loading hands each app its file back, and the app replaces what it holds. That is the only time Lingvale changes anything in the apps, and it happens only after you tick what to load and confirm. Any one backup can also be taken out of the zip and loaded in its app by hand. Moving needs the app versions released alongside Lingvale 1.4 or newer.
 
 ## Privacy
 

@@ -214,7 +214,7 @@ private fun Room(h: House) {
                     )
                     said = i to lines[(System.currentTimeMillis() / 1000 % lines.size).toInt()]
                 }) {
-                Sprite(pkg, p.species, p.stage, s, shiny = p.shiny)
+                Sprite(pkg, p.species, p.stage, s, shiny = p.shiny, frame = p.frame)
             }
         }
         said?.let { (i, text) ->
@@ -384,7 +384,7 @@ private fun Residents(h: House) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.Bottom) {
             team.forEach { p ->
                 Column(Modifier.width(108.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Sprite(h.pkg!!, p.species, p.stage, if (p.slot == 0) 96.dp else 80.dp, shiny = p.shiny)
+                    Sprite(h.pkg!!, p.species, p.stage, if (p.slot == 0) 96.dp else 80.dp, shiny = p.shiny, frame = p.frame)
                     Text(petName(h, p), style = Ink.h3, maxLines = 1)
                     Text((if (p.slot == 0) tr("вожак · ", "leader · ") else "") + stageName(p.stage).lowercase(), style = Ink.small)
                     if (p.stage < 4) Text(tr("до роста ${(p.progress * 100).toInt()}%", "${(p.progress * 100).toInt()}% to grow"), style = Ink.hand.copy(fontSize = androidx.compose.ui.unit.TextUnit(18f, androidx.compose.ui.unit.TextUnitType.Sp)))
@@ -400,7 +400,7 @@ private fun Residents(h: House) {
                 Row(Modifier.fillMaxWidth()) {
                     row.forEach { p ->
                         Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Sprite(h.pkg!!, p.species, p.stage, 54.dp, shiny = p.shiny)
+                            Sprite(h.pkg!!, p.species, p.stage, 54.dp, shiny = p.shiny, frame = p.frame)
                             Text(if (p.egg) tr("яйцо", "egg") else petName(h, p), style = Ink.small.copy(color = Ink.ink), maxLines = 1)
                             Text(if (p.egg) "${(p.progress * 100).toInt()}%" else stageName(p.stage).lowercase(), style = Ink.small, maxLines = 1)
                         }

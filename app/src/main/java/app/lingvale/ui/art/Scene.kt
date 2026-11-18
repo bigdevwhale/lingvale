@@ -324,7 +324,8 @@ private fun Valley(placed: List<House>, free: Int, spots: List<Pair<Float, Float
                     val amp = if (sleep || atFire) 0f else .04f + (seed % 3) * .012f
                     val px = baseX + amp * sin(t * sp + ph)
                     val goingLeft = amp > 0 && cos(t * sp + ph) < 0
-                    val frame = when { sleep && p.stage >= 3 -> 5; p.stage <= 1 -> 0; p.stage == 2 -> 1; else -> 2 }
+                    // An app that names the frame has its own pictures past the third (Roamling's grown forms), so no sleeping one.
+                    val frame = when { p.frame >= 0 -> p.frame; sleep && p.stage >= 3 -> 5; p.stage <= 1 -> 0; p.stage == 2 -> 1; else -> 2 }
                     val b = art.get(h.pkg, "pet_${p.species}_$frame") ?: return@forEachIndexed
                     val ph2 = when (p.stage) { 1 -> .042f; 2 -> .052f; else -> .062f } * h0
                     val pw = ph2 * b.width / b.height

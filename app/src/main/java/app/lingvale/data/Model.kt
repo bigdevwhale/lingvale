@@ -4,10 +4,14 @@ import app.lingvale.domain.tr
 import org.json.JSONArray
 import org.json.JSONObject
 
-/** A pet as its app describes it. [stage] 0 egg, 1 baby, 2 youngster, 3 grown, 4 master; [slot] 0 leader, 1–2 team, -1 resting. */
+/**
+ * A pet as its app describes it. [stage] 0 egg, 1 baby, 2 youngster, 3 grown, 4 master; [slot] 0 leader, 1–2 team, -1 resting.
+ * [frame] is the picture pet_<species>_<frame> when the app names it (Roamling: a grown companion has one of several forms),
+ * -1 to take it from the stage.
+ */
 data class PetInfo(
     val id: Long, val species: String, val name: String, val stage: Int, val progress: Double,
-    val slot: Int, val shiny: Boolean, val found: Long, val hatched: Long,
+    val slot: Int, val shiny: Boolean, val found: Long, val hatched: Long, val frame: Int = -1,
 ) {
     val egg get() = stage == 0
 }
@@ -48,7 +52,7 @@ data class Snap(
                 app = o.getString("app"), version = o.optString("version"), ru = o.optBoolean("ru", true), scene = o.optString("scene"),
                 pets = o.optJSONArray("pets").list {
                     PetInfo(it.getLong("id"), it.getString("species"), it.optString("name"), it.optInt("stage"), it.optDouble("progress", 0.0),
-                        it.optInt("slot", -1), it.optBoolean("shiny"), it.optLong("found"), it.optLong("hatched"))
+                        it.optInt("slot", -1), it.optBoolean("shiny"), it.optLong("found"), it.optLong("hatched"), it.optInt("frame", -1))
                 },
                 species = o.optJSONArray("species").list {
                     SpeciesInfo(it.getString("id"), it.optString("ru"), it.optString("en"), color(it.optString("color")),

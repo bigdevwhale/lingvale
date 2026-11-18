@@ -32,6 +32,10 @@ SKINS = {
                "a grand art-deco movie palace with golden trim, a tall vertical sign covered only in light bulbs (NO letters), a red carpet at the door"),
     "lodge": ("a little log cabin raised on tall wooden stilts above the grass, a ladder up to a small porch with a lantern, a pointed shingle roof with moss",
               "a wooden forest watchtower with a cosy closed cabin on top, a pitched roof, a lantern in the window, a long ladder and a small woodshed at its foot"),
+    "gate": ("a little wayside rest stop: an open wooden shelter with a thatched roof over a bench, a backpack and a walking stick leaning on it, "
+             "a lantern on a post, a mossy milestone with blank faces and a small water pump",
+             "a round canvas cartographer's tent with a striped awning on poles, a big brass compass on a stand by the entrance, "
+             "rolled maps in a wicker basket and a small folding table with a lantern"),
 }
 
 

@@ -47,6 +47,9 @@ HOUSES = {
                "a candle lantern by the door, a crescent moon weathervane, a few loose pages",
     "lodge": "a small cozy log lodge at the edge of a forest: walls of dark round logs, a steep mossy shingle roof, a wide porch with a lantern "
              "hanging by the door, a stone chimney, a neat pile of firewood, a low wooden fence with an open gate, a few pinecones on the porch steps",
+    "gate": "a small stone gatehouse at the edge of the valley: a low arched stone gateway with a heavy wooden gate standing open, a cozy little "
+            "watch room above the arch with a pitched slate roof and a small window, a lantern hanging in the arch, a big map pinned on a wooden board "
+            "beside the gate showing only lines and blots (NO letters), a signpost with blank arrows, a few soft wisps of pale fog curling at its foot",
 }
 
 
@@ -136,6 +139,15 @@ OTHER["appicon"] = HEAD + """Image: the subject of an app launcher icon for a co
 A tiny village on a small round green hill: a little cottage with a red roof and a lit window, a small windmill behind it, a round tree,
 and one big glowing firefly hovering above the roof. Compact and bold, readable at small size, centered,
 filling about 80% of the image, on a flat solid pure magenta (#FF00FF) background with clear margin. Square image."""
+
+OTHER["actions"] = HEAD + """Image: a sprite sheet of 9 everyday-activity objects for a cozy pixel village game, all the same size and style.
+""" + STYLE + """ Plain objects, NO faces, NO eyes, NO characters, NO text or letters.
+Layout: 3 columns x 3 rows of equal square cells on a flat solid pure magenta (#FF00FF) background. One object per cell, centered, filling about
+70% of the cell, with clear margin; nothing touches the cell borders. No grid lines.
+Objects in order (left to right, top to bottom):
+1 a soft swirl of morning breath with a small green leaf floating in it, 2 a sturdy iron dumbbell, 3 a little stack of gold coins next to a small open ledger,
+4 a red-and-white striped popcorn bucket with a cinema ticket, 5 a stack of three textbooks with a graduation cap on top, 6 a game controller with a six-sided die,
+7 big round headphones with two music notes, 8 a fountain pen over a sheet of handwritten paper, 9 an open book with a ribbon bookmark."""
 
 
 def image_of(output):

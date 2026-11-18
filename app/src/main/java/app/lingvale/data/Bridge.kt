@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Bundle
+import android.os.ParcelFileDescriptor
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -18,7 +20,8 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
- * Talks to the -ling apps through their VillageProvider (ContentResolver.call, protocol v1).
+ * Talks to the -ling apps through their VillageProvider (ContentResolver.call). Protocol v1 reads the pets and the days;
+ * v2 also has an app write its own backup file into a file of ours, and load one back (see [Mover]).
  * A dev build of Lingvale prefers the dev builds of the apps, a demo build the demo ones.
  */
 class Bridge(private val ctx: Context) {
@@ -51,6 +54,27 @@ class Bridge(private val ctx: Context) {
     fun art(pkg: String, name: String): ByteArray? = try {
         ctx.contentResolver.call(uri(pkg), "art", name, null)?.getByteArray("bytes")
     } catch (_: Exception) { null }
+
+    /** The protocol [pkg] speaks: from 2 on it can save and load its backup. 0 when it doesn't answer. */
+    fun speaks(pkg: String): Int = try {
+        ctx.contentResolver.call(uri(pkg), "hello", null, null)?.getInt("v") ?: 0
+    } catch (_: Exception) { 0 }
+
+    /** Has [pkg] write the backup its own settings would save into [to]. The file's name as the app calls it, or null if it couldn't. */
+    fun backup(pkg: String, to: File): String? = try {
+        ParcelFileDescriptor.open(to, ParcelFileDescriptor.MODE_CREATE or ParcelFileDescriptor.MODE_TRUNCATE or ParcelFileDescriptor.MODE_WRITE_ONLY).use { fd ->
+            val b = ctx.contentResolver.call(uri(pkg), "backup", null, Bundle().apply { putParcelable("fd", fd) })
+            if (b?.getBoolean("ok") == true) b.getString("name") else null
+        }
+    } catch (_: Exception) { null }
+
+    /** Has [pkg] load the backup [from], replacing what it holds. Null when it did, else why not: "newer", "busy" or "bad". */
+    fun restore(pkg: String, from: File): String? = try {
+        ParcelFileDescriptor.open(from, ParcelFileDescriptor.MODE_READ_ONLY).use { fd ->
+            val b = ctx.contentResolver.call(uri(pkg), "restore", null, Bundle().apply { putParcelable("fd", fd) })
+            if (b?.getBoolean("ok") == true) null else b?.getString("error") ?: "bad"
+        }
+    } catch (_: Exception) { "bad" }
 
     fun launch(pkg: String): Intent? = ctx.packageManager.getLaunchIntentForPackage(pkg)
 }

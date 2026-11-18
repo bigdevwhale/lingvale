@@ -11,6 +11,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import app.lingvale.domain.today
+import org.json.JSONArray
+import org.json.JSONObject
 
 /** The few settings: the theme ("", "light", "dark") and whether the welcome was read. */
 class Prefs(ctx: Context) {
@@ -61,6 +63,24 @@ class Prefs(ctx: Context) {
         sp.edit().putInt("spent", p.spent).putInt("bonus", p.bonus).putStringSet("owned", p.owned).putStringSet("claimed", p.claimed).putLong("letter", p.letter).putStringSet("got", p.got).apply()
         _progress.value = p
     }
+
+    /** The village's own things for a moving file: what is built, how it looks, what was bought and claimed. */
+    fun export(): JSONObject = JSONObject()
+        .put("theme", _theme.value).put("built", JSONArray(_built.value))
+        .put("bg", _style.value.bg).put("path", _style.value.path).put("weather", _style.value.weather)
+        .put("skins", JSONObject(_style.value.skins.filterValues { it > 0 }))
+        .put("start", _progress.value.start).put("spent", _progress.value.spent).put("bonus", _progress.value.bonus).put("letter", _progress.value.letter)
+        .put("owned", JSONArray(_progress.value.owned)).put("claimed", JSONArray(_progress.value.claimed)).put("got", JSONArray(_progress.value.got))
+
+    /** Puts a moving file's village in place of this one. Throws on a file that isn't right, before anything changes. */
+    fun restore(o: JSONObject) {
+        fun strings(k: String) = o.optJSONArray(k)?.let { a -> (0 until a.length()).map { a.getString(it) } }.orEmpty()
+        val skins = o.optJSONObject("skins")?.let { s -> s.keys().asSequence().associateWith { s.getInt(it) } }.orEmpty()
+        val style = Styling(o.optString("bg", "summer"), o.optString("path", "sand"), o.optString("weather"), skins)
+        val p = Progress(o.getLong("start"), o.optInt("spent"), o.optInt("bonus"), strings("owned").toSet(), strings("claimed").toSet(), o.optLong("letter"), strings("got").toSet())
+        sp.edit().putLong("start", p.start).putBoolean("welcomed", true).putBoolean("askedToBuild", true).apply()
+        setTheme(o.optString("theme")); setBuilt(strings("built")); setStyle { style }; update { p }
+    }
 }
 
 /**
@@ -78,6 +98,7 @@ class AppContainer(context: Context) {
     val bridge = Bridge(context)
     val art = ArtStore(context, bridge, scope)
     val village = Village(context, bridge, art)
+    val mover = app.lingvale.data.Mover(context, bridge, prefs, village, scope)
 }
 
 class LingvaleApp : Application() {

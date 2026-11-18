@@ -112,7 +112,7 @@ private fun Stamp(h: House, sp: SpeciesInfo, no: Int, best: PetInfo?, modifier: 
             val w = maxWidth
             Box(Modifier.fillMaxSize().padding(horizontal = w * .1f, vertical = w * .1f).background(if (best != null) pale(sp.color) else Ink.wash(0x0F)))
             if (best != null) {
-                Sprite(h.pkg!!, sp.id, best.stage, w * .74f, Modifier.align(Alignment.Center).offset(y = w * .04f), shiny = best.shiny)
+                Sprite(h.pkg!!, sp.id, best.stage, w * .74f, Modifier.align(Alignment.Center).offset(y = w * .04f), shiny = best.shiny, frame = best.frame)
                 ArtIcon("postmark", w * .42f, Modifier.align(Alignment.TopEnd).offset(x = w * .04f, y = -w * .02f).alpha(.45f).rotate(-12f))
                 if (best.shiny) ArtIcon("star", w * .2f, Modifier.align(Alignment.BottomEnd).offset(x = -w * .12f, y = -w * .12f))
             } else {
@@ -144,7 +144,7 @@ private fun PickSheet(p: Pick, onClose: () -> Unit) {
             if (mine.isEmpty()) IconLine("g_egg", tr("Яйцо этого вида находят в ${p.house.home.app}.", "Its egg is found in ${p.house.home.app}."))
             mine.forEach { pet ->
                 Row(Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Sprite(p.house.pkg!!, pet.species, pet.stage, 40.dp, shiny = pet.shiny)
+                    Sprite(p.house.pkg!!, pet.species, pet.stage, 40.dp, shiny = pet.shiny, frame = pet.frame)
                     Spacer(Modifier.width(10.dp))
                     Text(pet.name.ifBlank { p.sp.name }, style = Ink.h3, modifier = Modifier.weight(1f))
                     Text(stageName(pet.stage).lowercase() + if (pet.stage < 4) tr(" · ${(pet.progress * 100).toInt()}% до роста", " · ${(pet.progress * 100).toInt()}% to grow") else "", style = Ink.small)

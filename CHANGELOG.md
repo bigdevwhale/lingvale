@@ -6,6 +6,18 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.4.0] - 2026-11-18
+
+### Added
+- **Roamling moves in:** its gatehouse stands at the valley's gate, facing the fog, with the companions of your walks. A day counts walks and their minutes. The shop sells two more designs for it, the rest stop and the cartographer's tent.
+- **Moving house:** the settings can save one file with the backups of every installed app of the family and the village itself (what is built, the shop, the fireflies). On a new phone install the apps, open the file in the settings, tick what to load, and each app gets its own back. Apps that aren't installed yet can be loaded later from the same file. Needs the app versions released alongside this one.
+- **Each grown companion keeps its own form:** an app can now name the picture of a pet, so a Roamling companion that grew in the park or by the water looks the way it does in Roamling (with the next Roamling).
+
+<!-- tg
+В долину переезжает Roamling: застава у ворот, лицом к туману, и попутчики ваших прогулок.
+Переезд на новый телефон: в настройках можно сохранить все приложения семейства и деревню в один файл и загрузить его обратно.
+-->
+
 ## [1.3.0] - 2026-11-17
 
 ### Added

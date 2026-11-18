@@ -34,11 +34,11 @@ fun shinyFilter(): ColorFilter {
 /** The frame of a pet sheet for a stage: 0 baby, 1 youngster, 2 grown (and master). */
 fun frameFor(stage: Int) = when { stage <= 1 -> 0; stage == 2 -> 1; else -> 2 }
 
-/** A creature borrowed from its app: an egg for stage 0, a dark silhouette when [shadow] (not met yet). */
+/** A creature borrowed from its app: an egg for stage 0, a dark silhouette when [shadow] (not met yet); [frame] as the app names it, -1 by the stage. */
 @Composable
-fun Sprite(pkg: String, species: String, stage: Int, size: Dp, modifier: Modifier = Modifier, shiny: Boolean = false, shadow: Boolean = false, tint: Color = Color(0x33000000)) {
+fun Sprite(pkg: String, species: String, stage: Int, size: Dp, modifier: Modifier = Modifier, shiny: Boolean = false, shadow: Boolean = false, tint: Color = Color(0x33000000), frame: Int = -1) {
     val art = LocalContext.current.container.art
-    val name = if (stage == 0) "egg_$species" else "pet_${species}_${frameFor(stage)}"
+    val name = if (stage == 0) "egg_$species" else "pet_${species}_${if (frame >= 0) frame else frameFor(stage)}"
     Canvas(modifier.size(size)) {
         val img = art.get(pkg, name) ?: return@Canvas
         val w = this.size.width; val h = this.size.height
