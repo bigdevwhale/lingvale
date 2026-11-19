@@ -26,7 +26,7 @@
 
 ## Какие приложения уже переезжают
 
-Puffling, Pumpling, Pennyling, Reelkin, Inkling, Questling, Songling, Keyling и Familiar – им нужна версия, вышедшая вместе с Lingvale 1.0 или новее, и Wildling и Roamling с версии 1.0.
+Puffling, Pumpling, Pennyling, Reelkin, Inkling, Questling, Songling, Keyling и Familiar – им нужна версия, вышедшая вместе с Lingvale 1.0 или новее, а Wildling, Roamling и Knackling – с версии 1.0.
 
 ## Как это устроено
 

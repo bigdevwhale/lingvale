@@ -6,6 +6,16 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.5.0] - 2026-11-19
+
+### Added
+- **Knackling moves in:** its tall craftsman's house with the attic workshop stands in the valley with the apprentices of your hobbies. A day counts sessions and their minutes. The shop sells two more designs for it, the potter's hut and the workshop wagon.
+
+<!-- tg
+В долину переезжает Knackling: высокий дом с мастерской на чердаке и подмастерья ваших хобби.
+В лавке – ещё два вида для него: гончарная хижина и фургон-мастерская.
+-->
+
 ## [1.4.0] - 2026-11-18
 
 ### Added

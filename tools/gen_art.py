@@ -45,6 +45,9 @@ HOUSES = {
             "small windows on the sides, a quill pen weathervane, a stack of paper by the door",
     "reading": "a crooked whimsical reading hut built from stacked giant old books, a pointed violet roof like a witch hat, a round window, "
                "a candle lantern by the door, a crescent moon weathervane, a few loose pages",
+    "workshop": "a tall narrow cozy craftsman's house with a big attic workshop: timber-framed walls painted cream, a steep red tile roof with a large round "
+                "attic window glowing warm, a little balcony with balls of yarn in a basket, a wooden sign bracket with a hanging spool of thread (NO letters), "
+                "a wooden bench by the door with an easel and a guitar leaning on it",
     "lodge": "a small cozy log lodge at the edge of a forest: walls of dark round logs, a steep mossy shingle roof, a wide porch with a lantern "
              "hanging by the door, a stone chimney, a neat pile of firewood, a low wooden fence with an open gate, a few pinecones on the porch steps",
     "gate": "a small stone gatehouse at the edge of the valley: a low arched stone gateway with a heavy wooden gate standing open, a cozy little "

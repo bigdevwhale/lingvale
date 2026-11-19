@@ -37,6 +37,9 @@
         <package android:name="app.roamling" />
         <package android:name="app.roamling.dev" />
         <package android:name="app.roamling.demo" />
+        <package android:name="app.knackling" />
+        <package android:name="app.knackling.dev" />
+        <package android:name="app.knackling.demo" />
     </queries>
 
     <application

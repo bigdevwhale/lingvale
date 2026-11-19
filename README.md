@@ -26,7 +26,7 @@ Each of our apps has its own pet and its own home. Puffling's puffins live in a 
 
 ## Which apps move in
 
-Puffling, Pumpling, Pennyling, Reelkin, Inkling, Questling, Songling, Keyling and Familiar, in the versions released alongside Lingvale 1.0 or newer, and Wildling and Roamling from 1.0.
+Puffling, Pumpling, Pennyling, Reelkin, Inkling, Questling, Songling, Keyling and Familiar, in the versions released alongside Lingvale 1.0 or newer, and Wildling, Roamling and Knackling from 1.0.
 
 ## How it works
 
