@@ -6,6 +6,16 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.6.0] - 2026-11-20
+
+### Added
+- **A name for the village:** tap the title on the village screen, or open Settings, and call it whatever you like. The name goes into the header and the newspaper and moves with the moving file; an empty one brings back "Lingvale".
+
+<!-- tg
+Деревне теперь можно дать своё название: нажмите на заголовок или откройте настройки.
+Название появится в шапке и в газете и переедет вместе с файлом переезда.
+-->
+
 ## [1.5.0] - 2026-11-19
 
 ### Added
