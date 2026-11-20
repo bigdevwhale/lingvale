@@ -139,6 +139,11 @@ private fun SettingsSheet(onClose: () -> Unit) {
                 Pill("Русский", lang == "ru", { setLanguage("ru") })
                 Pill("English", lang == "en", { setLanguage("en") })
             }
+            app.lingvale.ui.components.PaperSection(tr("Название деревни", "Village name")) {}
+            val vName by c.prefs.name.collectAsState()
+            var naming by remember { mutableStateOf(false) }
+            if (naming) NameDialog { naming = false }
+            Pill(app.lingvale.villageName(vName) + "  ✎", false, { naming = true })
             MovingSection()
             app.lingvale.ui.components.PaperSection(tr("О деревне", "About")) {}
             Text(tr("Lingvale берёт питомцев и дни у самих приложений и никуда их не отправляет: всё остаётся на телефоне. В приложениях она ничего не меняет, кроме одного случая: когда вы сами загружаете файл переезда.",
@@ -176,4 +181,24 @@ private fun Welcome(onDone: () -> Unit) {
         }
         }
     }
+}
+
+/** Gives the village a name of its own (#7); an empty one brings back «Lingvale». */
+@Composable
+fun NameDialog(onClose: () -> Unit) {
+    val c = LocalContext.current.container
+    var text by remember { mutableStateOf(c.prefs.name.value) }
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text(tr("Как назовём деревню?", "What shall we call the village?"), style = app.lingvale.ui.theme.Ink.head) },
+        text = {
+            Column {
+                androidx.compose.material3.OutlinedTextField(text, { text = it.take(app.lingvale.NAME_MAX) }, Modifier.fillMaxWidth(), singleLine = true,
+                    placeholder = { Text("Lingvale") }, supportingText = { Text("${text.length}/${app.lingvale.NAME_MAX}") })
+                Text(tr("Пустое поле вернёт «Lingvale».", "Leave it empty for «Lingvale»."), style = app.lingvale.ui.theme.Ink.body)
+            }
+        },
+        confirmButton = { androidx.compose.material3.TextButton(onClick = { c.prefs.setName(text); onClose() }) { Text(tr("Готово", "Done")) } },
+        dismissButton = { androidx.compose.material3.TextButton(onClick = onClose) { Text(tr("Отмена", "Cancel")) } },
+    )
 }

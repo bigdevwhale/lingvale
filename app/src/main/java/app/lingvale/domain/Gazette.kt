@@ -40,13 +40,13 @@ object Gazette {
         ), seed + n)
     }
 
-    fun issue(live: List<House>, d: Long, start: Long, levelName: String, shopHint: String?): Issue {
+    fun issue(live: List<House>, d: Long, start: Long, levelName: String, shopHint: String?, village: String = "Lingvale"): Issue {
         val busy = Game.busy(live, d)
         val gain = Game.dayGain(live, d)
         val loc = if (Lang.ru) Locale.forLanguageTag("ru") else Locale.ENGLISH
         val date = LocalDate.ofEpochDay(d).format(DateTimeFormatter.ofPattern(if (Lang.ru) "EEEE, d MMMM" else "EEEE, d MMMM", loc))
         val number = (d - start + 1).coerceAtLeast(1)
-        val dateLine = tr("№ $number · $date · ${levelName.lowercase()} Lingvale · цена – один светлячок", "No. $number · $date · Lingvale ${levelName.lowercase()} · price: one firefly")
+        val dateLine = tr("№ $number · $date · ${levelName.lowercase()} $village · цена – один светлячок", "No. $number · $date · $village ${levelName.lowercase()} · price: one firefly")
         val dayOf = { h: House -> h.snap!!.days.first { it.d == d } }
         val headline = when (busy.size) {
             0 -> tr("Тихий день в долине", "A quiet day in the valley")

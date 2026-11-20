@@ -114,7 +114,8 @@ private fun Paper(live: List<House>, day: Long, onDay: (Long) -> Unit) {
     val hint = Game.decor.firstOrNull { it.id !in pr.owned && it.cost > balance && it.level <= Game.level(total).n }?.let {
         tr("Лавка сообщает: «${it.name}» ждёт покупателя – ${it.cost} светлячков.", "The shop says: the ${it.name.lowercase()} awaits a buyer – ${it.cost} fireflies.")
     }
-    val issue: Issue = remember(live, day, pr) { Gazette.issue(live, day, pr.start, Game.level(total).name, hint) }
+    val vName by LocalContext.current.container.prefs.name.collectAsState()
+    val issue: Issue = remember(live, day, pr, vName) { Gazette.issue(live, day, pr.start, Game.level(total).name, hint, app.lingvale.villageName(vName)) }
 
     Skyline(live, pr.owned)
     Text(tr("ВЕСТНИК ЛИНГВЕЙЛА", "THE LINGVALE GAZETTE"), style = Ink.mast, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())

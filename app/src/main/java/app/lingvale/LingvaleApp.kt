@@ -15,11 +15,21 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /** The few settings: the theme ("", "light", "dark") and whether the welcome was read. */
+/** How long the village's name may be. */
+const val NAME_MAX = 24
+
+/** What the village is called: the player's name for it or «Lingvale». */
+fun villageName(n: String) = n.ifBlank { "Lingvale" }
+
 class Prefs(ctx: Context) {
     private val sp = ctx.getSharedPreferences("lingvale", Context.MODE_PRIVATE)
     private val _theme = MutableStateFlow(sp.getString("theme", "").orEmpty())
     val theme: StateFlow<String> = _theme
     fun setTheme(t: String) { sp.edit().putString("theme", t).apply(); _theme.value = t }
+    private val _name = MutableStateFlow(sp.getString("name", "").orEmpty())
+    /** The village's own name, given by the player (#7); blank keeps «Lingvale». */
+    val name: StateFlow<String> = _name
+    fun setName(n: String) { val t = n.trim().take(NAME_MAX); sp.edit().putString("name", t).apply(); _name.value = t }
     private val _built = MutableStateFlow(sp.getString("built", "").orEmpty().split(',').filter { it.isNotBlank() })
     /** The houses the player chose to build, in the order they went up; only these stand in the village. */
     val built: StateFlow<List<String>> = _built
@@ -66,7 +76,7 @@ class Prefs(ctx: Context) {
 
     /** The village's own things for a moving file: what is built, how it looks, what was bought and claimed. */
     fun export(): JSONObject = JSONObject()
-        .put("theme", _theme.value).put("built", JSONArray(_built.value))
+        .put("theme", _theme.value).put("name", _name.value).put("built", JSONArray(_built.value))
         .put("bg", _style.value.bg).put("path", _style.value.path).put("weather", _style.value.weather)
         .put("skins", JSONObject(_style.value.skins.filterValues { it > 0 }))
         .put("start", _progress.value.start).put("spent", _progress.value.spent).put("bonus", _progress.value.bonus).put("letter", _progress.value.letter)
@@ -79,7 +89,7 @@ class Prefs(ctx: Context) {
         val style = Styling(o.optString("bg", "summer"), o.optString("path", "sand"), o.optString("weather"), skins)
         val p = Progress(o.getLong("start"), o.optInt("spent"), o.optInt("bonus"), strings("owned").toSet(), strings("claimed").toSet(), o.optLong("letter"), strings("got").toSet())
         sp.edit().putLong("start", p.start).putBoolean("welcomed", true).putBoolean("askedToBuild", true).apply()
-        setTheme(o.optString("theme")); setBuilt(strings("built")); setStyle { style }; update { p }
+        setTheme(o.optString("theme")); setName(o.optString("name")); setBuilt(strings("built")); setStyle { style }; update { p }
     }
 }
 

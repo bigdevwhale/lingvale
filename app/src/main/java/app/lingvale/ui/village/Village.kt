@@ -108,7 +108,11 @@ fun VillageScreen(houses: List<House>, onHouse: (House) -> Unit, onSettings: () 
     Column(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color(0xFF6FA8C8), Color(0xFF8FC0D8), Color(0xFF8DBE6C))))) {
         Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 14.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text(tr("${level.name} Lingvale", "Lingvale ${level.name.lowercase()}"), style = T.h2.copy(color = Color.White, shadow = androidx.compose.ui.graphics.Shadow(Color(0x66000000), androidx.compose.ui.geometry.Offset(0f, 2f), 4f)))
+                val vName by c.prefs.name.collectAsState()
+                var naming by remember { mutableStateOf(false) }
+                if (naming) app.lingvale.ui.NameDialog { naming = false }
+                // tap the name to give the village one of your own (#7)
+                Text(tr("${level.name} ${app.lingvale.villageName(vName)}", "${app.lingvale.villageName(vName)} ${level.name.lowercase()}"), modifier = Modifier.clickable { naming = true }, style = T.h2.copy(color = Color.White, shadow = androidx.compose.ui.graphics.Shadow(Color(0x66000000), androidx.compose.ui.geometry.Offset(0f, 2f), 4f)))
                 if (next != null) {
                     Box(Modifier.padding(top = 3.dp, bottom = 2.dp).width(150.dp).height(5.dp).clip(RoundedCornerShape(3.dp)).background(Color(0x55FFFFFF))) {
                         Box(Modifier.fillMaxWidth(((total - level.from).toFloat() / (next.from - level.from)).coerceIn(0f, 1f)).height(5.dp).background(Color(0xFFFFE08A)))
