@@ -6,6 +6,16 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.6.1] - 2026-11-22
+
+### Fixed
+- **Houses no longer disappear on Xiaomi and other phones that won't let one app wake another:** an app that isn't running keeps its house with what it showed the last time it answered, instead of turning back into a plot until you open it. If it has never answered, its plot says to open it once or allow it to autostart, not to update it.
+
+<!-- tg
+Дома в долине больше не пропадают на Xiaomi и других телефонах, где приложение нельзя разбудить из другого: дом остаётся с тем, что было при последнем ответе.
+Чтобы жильцы обновлялись сами, разрешите приложениям семейства автозапуск в настройках телефона.
+-->
+
 ## [1.6.0] - 2026-11-20
 
 ### Added
