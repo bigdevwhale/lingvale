@@ -65,8 +65,11 @@ data class Snap(
     }
 }
 
-/** Where a house stands: [LIVE] talks to us, [OLD] is installed but has no bridge yet, [LOCKED] refused (signed differently), [MISSING] isn't installed. */
-enum class Status { LIVE, OLD, LOCKED, MISSING }
+/**
+ * Where a house stands: [LIVE] talks to us, [OLD] is installed but has no bridge yet, [LOCKED] refused (signed differently),
+ * [ASLEEP] has the bridge but didn't answer (the phone wouldn't wake it: MIUI/HyperOS autostart, a battery saver), [MISSING] isn't installed.
+ */
+enum class Status { LIVE, OLD, LOCKED, ASLEEP, MISSING }
 
 data class House(val home: Home, val status: Status, val pkg: String?, val snap: Snap?) {
     val live get() = snap != null && status == Status.LIVE

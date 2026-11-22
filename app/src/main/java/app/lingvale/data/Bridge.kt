@@ -35,19 +35,23 @@ class Bridge(private val ctx: Context) {
 
     private fun uri(pkg: String) = Uri.parse("content://$pkg.village")
 
+    /** True when [pkg] declares the village provider, i.e. a version that has the bridge, whether or not it's running. */
+    private fun bridged(pkg: String) = try { ctx.packageManager.resolveContentProvider("$pkg.village", 0) != null } catch (_: Exception) { false }
+
     /** Asks [home] for its snapshot; the status says why when there is none. */
     fun ask(home: Home): Pair<Status, Pair<String?, String?>> {
         val pkg = find(home) ?: return Status.MISSING to (null to null)
+        // A version with the bridge that still doesn't answer is asleep: some phones (MIUI/HyperOS autostart, battery savers)
+        // won't start another app's process from the background, so it only answers while it's already running.
+        val silent = { if (bridged(pkg)) Status.ASLEEP else Status.OLD }
         return try {
             val b = ctx.contentResolver.call(uri(pkg), "snapshot", null, null)
-            val json = b?.getString("json") ?: return Status.OLD to (pkg to null)
+            val json = b?.getString("json") ?: return silent() to (pkg to null)
             Status.LIVE to (pkg to json)
         } catch (_: SecurityException) {
             Status.LOCKED to (pkg to null)
-        } catch (_: IllegalArgumentException) {
-            Status.OLD to (pkg to null)           // «Unknown authority»: a version from before the village
         } catch (_: Exception) {
-            Status.OLD to (pkg to null)
+            silent() to (pkg to null)             // «Unknown authority»: a version from before the village, or one that can't be woken
         }
     }
 
@@ -116,10 +120,12 @@ class Village(private val ctx: Context, private val bridge: Bridge, private val 
     /** True once the apps have been asked at least once since the start. */
     val ready: StateFlow<Boolean> = _ready
 
+    private fun cached(h: Home): Snap? = runCatching { Snap.parse(File(snapDir, "${h.id}.json").readText()) }.getOrNull()
+
     /** The last snapshots, shown at once before the apps answer. */
     private fun load(): List<House> = Family.all.map { h ->
         val pkg = bridge.find(h)
-        val snap = if (pkg == null) null else runCatching { Snap.parse(File(snapDir, "${h.id}.json").readText()) }.getOrNull()
+        val snap = if (pkg == null) null else cached(h)
         House(h, if (pkg == null) Status.MISSING else if (snap != null) Status.LIVE else Status.OLD, pkg, snap)
     }.also { l -> art.versions = l.mapNotNull { h -> h.pkg?.let { p -> h.snap?.let { p to it.version } } }.toMap() }
 
@@ -132,7 +138,13 @@ class Village(private val ctx: Context, private val bridge: Bridge, private val 
             val (pkg, json) = r
             val snap = json?.let { j -> runCatching { Snap.parse(j) }.getOrNull() }
             if (json != null && snap != null) runCatching { File(snapDir, "${h.id}.json").writeText(json) }
-            House(h, if (status == Status.LIVE && snap == null) Status.OLD else status, pkg, snap)
+            // An app that is asleep keeps its house as it was the last time it answered, instead of turning back into a plot.
+            val last = if (status == Status.ASLEEP) cached(h) else null
+            when {
+                last != null -> House(h, Status.LIVE, pkg, last)
+                status == Status.LIVE && snap == null -> House(h, Status.OLD, pkg, null)
+                else -> House(h, status, pkg, snap)
+            }
         }
         art.versions = l.mapNotNull { h -> h.pkg?.let { p -> h.snap?.let { p to it.version } } }.toMap()
         _houses.value = l

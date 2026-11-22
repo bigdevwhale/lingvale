@@ -158,6 +158,8 @@ fun HouseBody(h: House, modifier: Modifier = Modifier, startTab: Int = 0, onDemo
                     when (h.status) {
                         Status.OLD -> tr("Вещи уже в ящиках: ${h.home.app} стоит на телефоне, но в этой версии ещё нет дороги в деревню. Обновите приложение – и дом встанет здесь вместе с жильцами.",
                             "The things are already in crates: ${h.home.app} is on the phone, but this version has no road to the village yet. Update it and the house moves in with its residents.")
+                        Status.ASLEEP -> tr("${h.home.app} спит и не слышит деревню: телефон не даёт разбудить его из другой программы. Откройте ${h.home.app} один раз – дом встанет, и дальше деревня будет помнить его. Чтобы жильцы обновлялись сами, разрешите ${h.home.app} автозапуск в настройках телефона (на Xiaomi: «Приложения» → ${h.home.app} → «Автозапуск»).",
+                            "${h.home.app} is asleep and can't hear the village: the phone won't let another app wake it. Open ${h.home.app} once and the house moves in; the village remembers it after that. To keep the residents up to date by themselves, allow ${h.home.app} to autostart in the phone's settings (on Xiaomi: Apps → ${h.home.app} → Autostart).")
                         Status.LOCKED -> tr("${h.home.app} и деревня собраны разными ключами, поэтому жильцы не могут переехать. Поставьте обе программы из одного места.",
                             "${h.home.app} and the village are signed with different keys, so the residents can't move in. Install both from the same place.")
                         else -> tr("Участок ждёт хозяев. Здесь встанет ${h.home.house.lowercase()}, когда на телефоне появится ${h.home.app}.",

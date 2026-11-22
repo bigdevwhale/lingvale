@@ -358,6 +358,7 @@ fun BuildSheet(all: List<House>, built: List<String>, onBuild: (House) -> Unit, 
                                 Text(when (h.status) {
                                     Status.OLD -> tr("обновите ${h.home.app}", "update ${h.home.app}")
                                     Status.LOCKED -> tr("${h.home.app} собран другим ключом", "${h.home.app} is signed differently")
+                                    Status.ASLEEP -> tr("откройте ${h.home.app} один раз", "open ${h.home.app} once")
                                     else -> tr("поставьте ${h.home.app} ›", "install ${h.home.app} ›")
                                 }, style = Ink.small)
                             }

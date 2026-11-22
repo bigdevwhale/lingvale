@@ -156,7 +156,7 @@ fun decorPlaces(owned: Set<String>, spots: List<Pair<Float, Float>>, scale: Floa
 }
 
 /** Houses take the clearings from the top: the ones that live here first, then the ones moving in, then empty plots. */
-fun layout(houses: List<House>): List<House> = houses.sortedBy { when (it.status) { Status.LIVE -> 0; Status.OLD, Status.LOCKED -> 1; Status.MISSING -> 2 } }
+fun layout(houses: List<House>): List<House> = houses.sortedBy { when (it.status) { Status.LIVE -> 0; Status.OLD, Status.LOCKED, Status.ASLEEP -> 1; Status.MISSING -> 2 } }
 
 /** The light through the day, by the phone's clock: an hour and the colour the picture is multiplied by then. */
 private val LIGHT = listOf(
