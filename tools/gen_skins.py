@@ -32,6 +32,8 @@ SKINS = {
                "a grand art-deco movie palace with golden trim, a tall vertical sign covered only in light bulbs (NO letters), a red carpet at the door"),
     "workshop": ("a round potter's hut with a clay chimney and a kiln beside it, shelves of glazed pots under a wide eave, a spinning wheel by the door",
                  "a colourful painted wooden wagon-workshop on wheels with a striped awning, bunting of cloth flags, crates of tools and a little easel outside"),
+    "office": ("a small village post station of red brick with a wooden porch, a row of pigeonholes visible in the big window, a post horn emblem over the door (NO letters), a bicycle with a basket",
+               "a tiny white town hall with a clock tower (clock face without numbers), stone steps, two lamps by the door, a flag on the tower"),
     "lodge": ("a little log cabin raised on tall wooden stilts above the grass, a ladder up to a small porch with a lantern, a pointed shingle roof with moss",
               "a wooden forest watchtower with a cosy closed cabin on top, a pitched roof, a lantern in the window, a long ladder and a small woodshed at its foot"),
     "gate": ("a little wayside rest stop: an open wooden shelter with a thatched roof over a bench, a backpack and a walking stick leaning on it, "

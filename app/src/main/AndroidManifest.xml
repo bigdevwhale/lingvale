@@ -40,6 +40,9 @@
         <package android:name="app.knackling" />
         <package android:name="app.knackling.dev" />
         <package android:name="app.knackling.demo" />
+        <package android:name="app.deskling" />
+        <package android:name="app.deskling.dev" />
+        <package android:name="app.deskling.demo" />
     </queries>
 
     <application

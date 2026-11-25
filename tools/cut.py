@@ -69,7 +69,7 @@ def save(im, name):
     im.save(OUT / f"{name}.webp", "WEBP", quality=90, method=6)
 
 
-LOOKS = ["tea", "gym", "burrow", "tower", "tavern", "studio", "desk", "reading", "cinema", "lodge", "gate", "workshop"]
+LOOKS = ["tea", "gym", "burrow", "tower", "tavern", "studio", "desk", "reading", "cinema", "lodge", "gate", "workshop", "office"]
 DECOR = ["well", "lamp", "bench", "flowers", "fountain", "windmill", "signpost", "postbox",
          "haycart", "tent", "campfire", "appletree", "beehives", "board", "gazebo", "balloon"]
 ICONS = ["firefly", "jar", "scroll", "flags"]

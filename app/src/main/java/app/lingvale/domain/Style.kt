@@ -52,6 +52,7 @@ object Style {
         Look.LODGE to listOf("Избушка на сваях" to "Stilt cabin", "Наблюдательная вышка" to "Watchtower"),
         Look.GATE to listOf("Привал" to "Rest stop", "Шатёр картографа" to "Cartographer's tent"),
         Look.WORKSHOP to listOf("Гончарная хижина" to "Potter's hut", "Фургон-мастерская" to "Workshop wagon"),
+        Look.OFFICE to listOf("Почтовая станция" to "Post station", "Ратуша с часами" to "Clock-tower town hall"),
     )
 
     /** The designs of house [id] with look [look]: the original (0) and the two from the shop. */

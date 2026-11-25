@@ -48,6 +48,9 @@ HOUSES = {
     "workshop": "a tall narrow cozy craftsman's house with a big attic workshop: timber-framed walls painted cream, a steep red tile roof with a large round "
                 "attic window glowing warm, a little balcony with balls of yarn in a basket, a wooden sign bracket with a hanging spool of thread (NO letters), "
                 "a wooden bench by the door with an easel and a guitar leaning on it",
+    "office": "a little office built into the trunk of a huge old oak tree: a round green wooden door with a brass knob and a small brass plate (NO letters) between the roots, "
+              "a round window high in the trunk glowing warm, a small clock face on the bark above the door (no numbers), a wooden mailbox stuffed with envelopes, "
+              "a green banker's lamp in a lower window, a stack of folders tied with string on the step, oak leaves and acorns around",
     "lodge": "a small cozy log lodge at the edge of a forest: walls of dark round logs, a steep mossy shingle roof, a wide porch with a lantern "
              "hanging by the door, a stone chimney, a neat pile of firewood, a low wooden fence with an open gate, a few pinecones on the porch steps",
     "gate": "a small stone gatehouse at the edge of the valley: a low arched stone gateway with a heavy wooden gate standing open, a cozy little "

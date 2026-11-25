@@ -4,7 +4,7 @@ import app.lingvale.domain.Words
 import app.lingvale.domain.tr
 
 /** How a house looks in the village. */
-enum class Look { TEA, GYM, BURROW, TOWER, TAVERN, STUDIO, DESK, READING, CINEMA, LODGE, GATE, WORKSHOP }
+enum class Look { TEA, GYM, BURROW, TOWER, TAVERN, STUDIO, DESK, READING, CINEMA, LODGE, GATE, WORKSHOP, OFFICE }
 
 /**
  * One app of the -ling family: its house in the village. [bridged] apps already speak to Lingvale;
@@ -60,6 +60,9 @@ object Family {
         Home("knackling", "Knackling", "Мастерская", "Workshop", Look.WORKSHOP, 0xFFB4473A,
             Words("занятие", "занятия", "занятий", "session", "sessions"), true,
             "Хобби и их подмастерья", "Hobbies and their apprentices", "Хобби", "Hobby", bridged = true),
+        Home("deskling", "Deskling", "Контора", "Office", Look.OFFICE, 0xFF2F6B4F,
+            Words("дело", "дела", "дел", "task", "tasks"), true,
+            "Рабочие дела и зверьки-секретари", "Work tasks and little office creatures", "Дело", "Task", bridged = true),
     )
     val byId = all.associateBy { it.id }
 }
