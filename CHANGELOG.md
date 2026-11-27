@@ -6,7 +6,7 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
-## [Unreleased]
+## [1.7.0] - 2026-11-27
 
 ### Added
 - **Deskling joins the village:** its house is the Office, set in the old oak, and it counts your work tasks. The shop sells two more designs for it, a post station and a clock-tower town hall.
