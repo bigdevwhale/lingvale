@@ -6,6 +6,16 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [Unreleased]
+
+### Added
+- **Deskling joins the village:** its house is the Office, set in the old oak, and it counts your work tasks. The shop sells two more designs for it, a post station and a clock-tower town hall.
+
+<!-- tg
+В долину переехал Deskling: его дом — Контора в старом дубе, он считает рабочие дела.
+В лавке для Конторы есть почтовая станция и ратуша с часами.
+-->
+
 ## [1.6.1] - 2026-11-22
 
 ### Fixed
